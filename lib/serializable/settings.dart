@@ -12,14 +12,16 @@ class MuonSettings {
   bool darkMode = false;
   String neutrinoDir = "";
 
-  factory MuonSettings.fromJson(Map<String, dynamic> json) => _$MuonSettingsFromJson(json);
+  factory MuonSettings.fromJson(Map<String, dynamic> json) =>
+      _$MuonSettingsFromJson(json);
   Map<String, dynamic> toJson() => _$MuonSettingsToJson(this);
 
-  static MuonSettings loadFromFile([String settingsFile = "muon_settings.json"]) {
-    if(File(settingsFile).existsSync()) {
-      final file = new File(settingsFile);
+  static MuonSettings loadFromFile(
+      [String settingsFile = "muon_settings.json"]) {
+    if (File(settingsFile).existsSync()) {
+      final file = File(settingsFile);
 
-      if(file.existsSync()) {
+      if (file.existsSync()) {
         var fileContents = file.readAsStringSync();
 
         final jsonData = jsonDecode(fileContents);
@@ -33,20 +35,16 @@ class MuonSettings {
   }
 
   void save([String settingsFile = "muon_settings.json"]) {
-    final jsonContents = this.toJson();
+    final jsonContents = toJson();
     String fileContents = jsonEncode(jsonContents);
 
-    final file = new File(settingsFile);
+    final file = File(settingsFile);
     file.writeAsStringSync(fileContents);
   }
 }
 
 MuonSettings getMuonSettings() {
   var settings = MuonSettings.loadFromFile();
-
-  if(settings == null) {
-    return MuonSettings();
-  }
 
   return settings;
 }

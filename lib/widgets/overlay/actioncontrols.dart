@@ -1,10 +1,7 @@
-
-import 'package:flutter/material.dart';
-import 'package:muon/actions/base.dart';
+import "package:flutter/material.dart";
+import "package:muon/actions/base.dart";
+import "package:muon/editor.dart";
 import "package:synaps_flutter/synaps_flutter.dart";
-import 'package:muon/controllers/muonvoice.dart';
-import 'package:muon/editor.dart';
-import 'package:muon/logic/helpers.dart';
 
 class MuonActionControls extends StatelessWidget {
   const MuonActionControls({
@@ -21,8 +18,19 @@ class MuonActionControls extends StatelessWidget {
     final themeData = Theme.of(context);
     return Container(
       height: 34,
-      margin: EdgeInsets.symmetric(horizontal: 5,vertical: 5),
+      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       padding: EdgeInsets.only(left: 15),
+      decoration: BoxDecoration(
+          color: isPerformed
+              ? themeData.buttonColor.withOpacity(0.9)
+              : themeData.buttonColor.withOpacity(0.3),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.5),
+              blurRadius: 1,
+              spreadRadius: 1,
+            ),
+          ]),
       child: Row(
         children: [
           Align(
@@ -34,7 +42,9 @@ class MuonActionControls extends StatelessWidget {
                 overflow: TextOverflow.fade,
                 softWrap: false,
                 style: TextStyle(
-                  color: themeData.brightness == Brightness.dark ? Colors.grey[100] : Colors.grey[950],
+                  color: themeData.brightness == Brightness.dark
+                      ? Colors.grey[100]
+                      : Colors.grey[950],
                   fontSize: 13,
                 ),
               ),
@@ -47,25 +57,14 @@ class MuonActionControls extends StatelessWidget {
             icon: isPerformed ? const Icon(Icons.undo) : const Icon(Icons.redo),
             tooltip: isPerformed ? "Undo" : "Redo",
             onPressed: () {
-              if(isPerformed) {
+              if (isPerformed) {
                 currentProject.undoUntilAction(action);
-              }
-              else {
+              } else {
                 currentProject.redoUntilAction(action);
               }
             },
           ),
         ],
-      ),
-      decoration: BoxDecoration(
-        color: isPerformed ? themeData.buttonColor.withOpacity(0.9) : themeData.buttonColor.withOpacity(0.3),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.5),
-            blurRadius: 1,
-            spreadRadius: 1,
-          ),
-        ]
       ),
     );
   }

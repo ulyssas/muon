@@ -1,21 +1,21 @@
 import "dart:io";
 
-import "package:path/path.dart" as p;
 import "package:muon/serializable/settings.dart";
+import "package:path/path.dart" as p;
 
 class MuonHelpers {
   /// Returns a the absolute path to subdirectory `programName`
   /// inside the Neutrino directory
   static String getRawProgramPath(String subDir) {
-    return getMuonSettings().neutrinoDir + "/" + subDir;
+    return "${getMuonSettings().neutrinoDir}/$subDir";
   }
 
   /// Returns a the absolute path to subdirectory `programName`
   /// inside the Neutrino `bin` directory
   static String getProgramPath(String programName) {
-    String out = getMuonSettings().neutrinoDir + "/bin/" + programName;
+    String out = "${getMuonSettings().neutrinoDir}/bin/$programName";
 
-    if(Platform.isWindows) {
+    if (Platform.isWindows) {
       out += ".exe";
     }
 
@@ -25,15 +25,17 @@ class MuonHelpers {
   /// Returns a list of all available voice models
   /// (each entry is the name of the voice model folder)
   static List<String> getAllVoiceModels() {
-    if(getMuonSettings().neutrinoDir == "") {return [];}
+    if (getMuonSettings().neutrinoDir == "") {
+      return [];
+    }
     final List<String> items = [];
 
     final modelsDir = Directory(getRawProgramPath("model"));
     final modelsDirFiles = modelsDir.listSync();
 
-    for(final modelsDirFile in modelsDirFiles) {
-      if(modelsDirFile is Directory) {
-        final modelName = p.relative(modelsDirFile.path,from: modelsDir.path);
+    for (final modelsDirFile in modelsDirFiles) {
+      if (modelsDirFile is Directory) {
+        final modelName = p.relative(modelsDirFile.path, from: modelsDir.path);
         items.add(modelName);
       }
     }
@@ -47,7 +49,9 @@ class MuonHelpers {
   /// (alphabetically) first entry in getAllVoiceModels();
   static String getDefaultVoiceModel() {
     final models = getAllVoiceModels();
-    if(models.length == 0) {return "";}
+    if (models.isEmpty) {
+      return "";
+    }
     return models[0];
   }
 }

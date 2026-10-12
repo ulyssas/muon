@@ -1,29 +1,24 @@
-
 import "dart:async";
-import "dart:math";
 
+import "package:file_selector_platform_interface/file_selector_platform_interface.dart";
 import "package:flutter/material.dart";
-import "package:flutter/rendering.dart";
 import "package:flutter/services.dart";
-import "package:muon/controllers/muonnote.dart";
 import "package:muon/controllers/muonproject.dart";
 import "package:muon/controllers/muonvoice.dart";
-import "package:muon/logic/japanese.dart";
-import 'package:muon/pianoroll/modules/notes.dart';
-import 'package:muon/pianoroll/modules/waila.dart';
+import "package:muon/pianoroll/modules/notes.dart";
+import "package:muon/pianoroll/modules/waila.dart";
 import "package:muon/pianoroll/pianoroll.dart";
 import "package:muon/serializable/settings.dart";
-import "package:file_selector_platform_interface/file_selector_platform_interface.dart";
-import 'package:muon/widgets/dialogs/firsttimesetup.dart';
-import 'package:muon/widgets/dialogs/welcome.dart';
-import 'package:muon/widgets/overlay/appbar.dart';
-import 'package:muon/widgets/overlay/sidebar.dart';
+import "package:muon/widgets/dialogs/firsttimesetup.dart";
+import "package:muon/widgets/dialogs/welcome.dart";
+import "package:muon/widgets/overlay/appbar.dart";
+import "package:muon/widgets/overlay/sidebar.dart";
 import "package:path/path.dart" as p;
 
 final currentProject = MuonProjectController.defaultProject();
 
 class MuonEditor extends StatefulWidget {
-  MuonEditor() : super();
+  const MuonEditor({super.key});
 
   /// Shows the welcome screen via [showDialog]
   static void showWelcomeScreen(BuildContext context) {
@@ -52,116 +47,113 @@ class MuonEditor extends StatefulWidget {
   static Future openProject(BuildContext context) {
     return FileSelectorPlatform.instance.openFile(
       confirmButtonText: "Open Project",
-      acceptedTypeGroups: [XTypeGroup(
-        label: "Muon Project Files",
-        extensions: ["json"],
-      )],
-    )
-    .then((value) {
-      if(value != null) {
+      acceptedTypeGroups: [
+        XTypeGroup(
+          label: "Muon Project Files",
+          extensions: ["json"],
+        )
+      ],
+    ).then((value) {
+      if (value != null) {
         final proj = MuonProjectController.loadFromFile(value.path);
         currentProject.updateWith(proj);
 
         return true;
       }
-    })
-    .catchError((err) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Theme.of(context).errorColor,
-          content: new Text("internal error: " + err.toString()),
-          duration: new Duration(seconds: 10),
-        )
-      );
+    }).catchError((err) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Theme.of(context).colorScheme.error,
+        content: Text("internal error: $err"),
+        duration: Duration(seconds: 10),
+      ));
     }); // oh wow i am so naughty
   }
 
   /// Opens a file selector dialog and prompts the user to create
   /// a project.json file
   static Future createNewProject() {
-    return FileSelectorPlatform.instance.getSavePath(
+    return FileSelectorPlatform.instance
+        .getSavePath(
       confirmButtonText: "Create Project",
-      acceptedTypeGroups: [XTypeGroup(
-        label: "Muon Project Files",
-        extensions: ["json"],
-      )],
+      acceptedTypeGroups: [
+        XTypeGroup(
+          label: "Muon Project Files",
+          extensions: ["json"],
+        )
+      ],
       suggestedName: "project.json",
     )
-    .then((value) {
-      if(value != null) {
+        .then((value) {
+      if (value != null) {
         currentProject.updateWith(MuonProjectController.defaultProject());
         currentProject.projectDir = p.dirname(value);
         currentProject.projectFileName = p.basename(value);
-        if(!currentProject.projectFileName.endsWith(".json")) {
+        if (!currentProject.projectFileName.endsWith(".json")) {
           currentProject.projectFileName += ".json";
         }
         currentProject.save();
 
         return true;
       }
-    })
-    .catchError((err) {print("internal error: " + err.toString());}); // oh wow i am so naughty
+    }).catchError((err) {
+      print("internal error: $err");
+    }); // oh wow i am so naughty
   }
 
   /// Compiles all voices, and then plays audio from the playhead's
   /// current position
-  /// 
+  ///
   /// Will show snackbars on errors
-  /// 
+  ///
   static Future<void> playAudio(BuildContext context) async {
-    if(currentProject.internalStatus != "idle") {return;}
+    if (currentProject.internalStatus != "idle") {
+      return;
+    }
 
     List<Future<void>> compileRes = [];
     currentProject.internalStatus = "compiling";
-    for(final voice in currentProject.voices) {
+    for (final voice in currentProject.voices) {
       compileRes.add(_compileVoiceInternal(voice));
     }
     await Future.wait(compileRes);
     currentProject.internalStatus = "idle";
 
     final playPos = Duration(
-      milliseconds: currentProject.getLabelMillisecondOffset() + 
-        (
-          1000 * 
-          (
-            currentProject.playheadTime / 
-            (currentProject.bpm / 60)
-          )
-        ).floor()
-      );
+        milliseconds: currentProject.getLabelMillisecondOffset() +
+            (1000 * (currentProject.playheadTime / (currentProject.bpm / 60)))
+                .floor());
 
     List<Future<bool>> voiceRes = [];
-    for(final voice in currentProject.voices) {
-      voiceRes.add(_playVoiceInternal(voice,playPos, 1 / currentProject.voices.length));
+    for (final voice in currentProject.voices) {
+      voiceRes.add(
+          _playVoiceInternal(voice, playPos, 1 / currentProject.voices.length));
     }
 
     final voiceRes2 = await Future.wait(voiceRes);
 
     var errorShown = false;
-    for(final res in voiceRes2) {
-      if(!res) {
-        if(!errorShown) {
+    for (final res in voiceRes2) {
+      if (!res) {
+        if (!errorShown) {
           errorShown = true;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(backgroundColor: Theme.of(context).errorColor,
-              content: new Text("Unable to play audio!"),
-              duration: new Duration(seconds: 5),
-            )
-          );
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Theme.of(context).colorScheme.error,
+            content: Text("Unable to play audio!"),
+            duration: Duration(seconds: 5),
+          ));
         }
-      }
-      else {
+      } else {
         currentProject.internalStatus = "playing";
       }
     }
   }
 
   static Future<void> _compileVoiceInternal(MuonVoiceController voice) async {
-    if(voice.audioPlayer != null) {
+    if (voice.audioPlayer != null) {
       await voice.audioPlayer.unload();
     }
-    
-    if(voice.hasChangedNoteData) {
+
+    if (voice.hasChangedNoteData) {
       voice.hasChangedNoteData = false;
       await voice.makeLabels();
       await voice.runNeutrino();
@@ -170,33 +162,30 @@ class MuonEditor extends StatefulWidget {
   }
 
   /// Compiles all voices with NSF
-  /// 
+  ///
   /// Will show snackbars on progress
-  /// 
+  ///
   static Future<void> compileVoiceInternalNSF(BuildContext context) async {
     currentProject.internalStatus = "compiling_nsf";
     int voiceID = 0;
-    for(final voice in currentProject.voices) {
+    for (final voice in currentProject.voices) {
       voiceID++;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: new Text("Compiling voice " + voiceID.toString() + " with NSF..."),
-          duration: new Duration(seconds: 2),
-        )
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Compiling voice $voiceID with NSF..."),
+        duration: Duration(seconds: 2),
+      ));
       await voice.vocodeNSF();
     }
     currentProject.internalStatus = "idle";
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: new Text("NSF complete!"),
-        duration: new Duration(seconds: 2),
-      )
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("NSF complete!"),
+      duration: Duration(seconds: 2),
+    ));
   }
 
-  static Future<bool> _playVoiceInternal(MuonVoiceController voice,Duration playPos,double volume) async {
-    if(voice.audioPlayer != null) {
+  static Future<bool> _playVoiceInternal(
+      MuonVoiceController voice, Duration playPos, double volume) async {
+    if (voice.audioPlayer != null) {
       await voice.audioPlayer.unload();
     }
 
@@ -206,10 +195,9 @@ class MuonEditor extends StatefulWidget {
     await audioPlayer.setPosition(playPos);
     final suc = await audioPlayer.play();
 
-    if(suc) {
+    if (suc) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -217,15 +205,14 @@ class MuonEditor extends StatefulWidget {
   /// Stops any currently playing audio, if there is any.
   /// Otherwise, brings the playhead to the start of the project.
   static Future<void> stopAudio() async {
-    for(final voice in currentProject.voices) {
-      if(voice.audioPlayer != null) {
+    for (final voice in currentProject.voices) {
+      if (voice.audioPlayer != null) {
         voice.audioPlayer.unload();
       }
     }
-    if(currentProject.internalStatus == "playing") {
+    if (currentProject.internalStatus == "playing") {
       currentProject.internalStatus = "idle";
-    }
-    else {
+    } else {
       currentProject.playheadTime = 0;
     }
   }
@@ -240,17 +227,16 @@ class _MuonEditorState extends State<MuonEditor> {
   void _onFirstRun(BuildContext context) {
     final settings = getMuonSettings();
 
-    if(settings.neutrinoDir != "") {
+    if (settings.neutrinoDir != "") {
       // We have already performed first time set-up!
 
-      Timer(Duration(milliseconds: 1),() {
+      Timer(Duration(milliseconds: 1), () {
         MuonEditor.showWelcomeScreen(context);
       });
-    }
-    else {
+    } else {
       // no neutrino library, so let's perform first time set-up!
 
-      Timer(Duration(milliseconds: 1),() {
+      Timer(Duration(milliseconds: 1), () {
         MuonEditor.performFirstTimeSetup(context);
       });
     }
@@ -260,7 +246,7 @@ class _MuonEditorState extends State<MuonEditor> {
   Widget build(BuildContext context) {
     currentProject.setupPlaybackTimers();
 
-    if(_firstTimeRunning) {
+    if (_firstTimeRunning) {
       _firstTimeRunning = false;
       _onFirstRun(context);
     }
@@ -276,51 +262,42 @@ class _MuonEditorState extends State<MuonEditor> {
       //     ],
       //   )
       // ),
-      body: Row(
-        textDirection: TextDirection.rtl,
-        children: [
-          Expanded(
+      body: Row(textDirection: TextDirection.rtl, children: [
+        Expanded(
             child: PianoRoll(
-              project: currentProject,
-              modules: [
-                PianoRollNotesModule(selectedNotes: currentProject.selectedNotes),
-                PianoRollWAILAModule(),
-              ],
-              onKey: (pianoRoll,keyEvent) {
-                if(keyEvent.isControlPressed) {
-                  if(keyEvent.isKeyPressed(LogicalKeyboardKey.keyS)) {
-                    currentProject.save();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: new Text("Saved project!"),
-                        duration: new Duration(seconds: 2),
-                      )
-                    );
-                  }
-                  else if(keyEvent.isKeyPressed(LogicalKeyboardKey.keyZ)) {
-                    // undo
-                    currentProject.undoAction();
-                  }
-                  else if(keyEvent.isKeyPressed(LogicalKeyboardKey.keyY)) {
-                    // redo
-                    currentProject.redoAction();
-                  }
-                }
-                
-                if(keyEvent.isKeyPressed(LogicalKeyboardKey.space)) {
-                  if(currentProject.internalStatus == "playing") {
-                    MuonEditor.stopAudio();
-                  }
-                  else {
-                    MuonEditor.playAudio(context);
-                  }
-                }
-              },
-            )
-          ),
-          MuonSidebar(),
-        ]
-      ),
+          project: currentProject,
+          modules: [
+            PianoRollNotesModule(selectedNotes: currentProject.selectedNotes),
+            PianoRollWAILAModule(),
+          ],
+          onKey: (pianoRoll, keyEvent) {
+            if (keyEvent.isControlPressed) {
+              if (keyEvent.isKeyPressed(LogicalKeyboardKey.keyS)) {
+                currentProject.save();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Saved project!"),
+                  duration: Duration(seconds: 2),
+                ));
+              } else if (keyEvent.isKeyPressed(LogicalKeyboardKey.keyZ)) {
+                // undo
+                currentProject.undoAction();
+              } else if (keyEvent.isKeyPressed(LogicalKeyboardKey.keyY)) {
+                // redo
+                currentProject.redoAction();
+              }
+            }
+
+            if (keyEvent.isKeyPressed(LogicalKeyboardKey.space)) {
+              if (currentProject.internalStatus == "playing") {
+                MuonEditor.stopAudio();
+              } else {
+                MuonEditor.playAudio(context);
+              }
+            }
+          },
+        )),
+        MuonSidebar(),
+      ]),
     );
   }
 }

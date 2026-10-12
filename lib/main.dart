@@ -1,11 +1,10 @@
 import "dart:io";
 
 import "package:flutter/material.dart";
-import 'package:muon/controllers/settings.dart';
-import "package:muon/licenses.dart";
+import "package:muon/controllers/settings.dart";
 import "package:muon/editor.dart";
-import 'package:synaps_flutter/synaps_flutter.dart';
-
+import "package:muon/licenses.dart";
+import "package:synaps_flutter/synaps_flutter.dart";
 import "package:window_size/window_size.dart";
 
 /// Main app settings
@@ -19,26 +18,28 @@ void main() {
   }
 
   addLicenses();
-  
+
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Rx(() => MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "Muon",
-      themeMode: appSettings.darkMode ? ThemeMode.dark : ThemeMode.light,
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.purple,
-        brightness: Brightness.dark,
-      ),
-      home: MuonEditor(),
-    ));
+          debugShowCheckedModeBanner: false,
+          title: "Muon",
+          themeMode: appSettings.darkMode ? ThemeMode.dark : ThemeMode.light,
+          theme: ThemeData(
+            primarySwatch: Colors.purple,
+            brightness: Brightness.light,
+          ),
+          darkTheme: ThemeData(
+            primarySwatch: Colors.purple,
+            brightness: Brightness.dark,
+          ),
+          home: MuonEditor(),
+        ));
   }
 }

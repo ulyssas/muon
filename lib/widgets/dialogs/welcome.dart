@@ -1,10 +1,11 @@
+import "dart:io";
 
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:muon/editor.dart';
+import "package:flutter/material.dart";
+import "package:muon/editor.dart";
 
 class MuonWelcomeDialog extends StatelessWidget {
+  const MuonWelcomeDialog({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,24 +15,22 @@ class MuonWelcomeDialog extends StatelessWidget {
           child: ListBody(
             children: <Widget>[
               RaisedButton(
-                child: Text("Create New Project"),
-                onPressed: () async {
-                  final suc = await MuonEditor.createNewProject();
-                  if(suc == true) {
-                    Navigator.of(context, rootNavigator: true).pop();
-                  }
-                }
-              ),
+                  child: Text("Create New Project"),
+                  onPressed: () async {
+                    final suc = await MuonEditor.createNewProject();
+                    if (suc == true) {
+                      Navigator.of(context, rootNavigator: true).pop();
+                    }
+                  }),
               SizedBox(height: 10),
               RaisedButton(
-                child: Text("Open Project"),
-                onPressed: () async {
-                  final suc = await MuonEditor.openProject(context);
-                  if(suc == true) {
-                    Navigator.of(context, rootNavigator: true).pop();
-                  }
-                }
-              )
+                  child: Text("Open Project"),
+                  onPressed: () async {
+                    final suc = await MuonEditor.openProject(context);
+                    if (suc == true) {
+                      Navigator.of(context, rootNavigator: true).pop();
+                    }
+                  })
             ],
           ),
         ),

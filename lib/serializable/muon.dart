@@ -18,7 +18,8 @@ class MuonNote {
   int startAtTime;
   int duration;
 
-  factory MuonNote.fromJson(Map<String, dynamic> json) => _$MuonNoteFromJson(json);
+  factory MuonNote.fromJson(Map<String, dynamic> json) =>
+      _$MuonNoteFromJson(json);
   Map<String, dynamic> toJson() => _$MuonNoteToJson(this);
 }
 
@@ -39,7 +40,8 @@ class MuonVoice {
   // synthesised data
   // TODO: F0, Aperiodicity, Spectral Envelope
 
-  factory MuonVoice.fromJson(Map<String, dynamic> json) => _$MuonVoiceFromJson(json);
+  factory MuonVoice.fromJson(Map<String, dynamic> json) =>
+      _$MuonVoiceFromJson(json);
   Map<String, dynamic> toJson() => _$MuonVoiceToJson(this);
 }
 
@@ -65,20 +67,21 @@ class MuonProject {
 
   List<MuonVoice> voices = [];
 
-  factory MuonProject.fromJson(Map<String, dynamic> json) => _$MuonProjectFromJson(json);
+  factory MuonProject.fromJson(Map<String, dynamic> json) =>
+      _$MuonProjectFromJson(json);
   Map<String, dynamic> toJson() => _$MuonProjectToJson(this);
 
   static MuonProject loadFromFile(String projectFile) {
-    if(File(projectFile).existsSync()) {
-      final file = new File(projectFile);
+    if (File(projectFile).existsSync()) {
+      final file = File(projectFile);
 
-      if(file.existsSync()) {
+      if (file.existsSync()) {
         var fileContents = file.readAsStringSync();
 
         final jsonData = jsonDecode(fileContents);
         MuonProject project = MuonProject.fromJson(jsonData);
 
-        for(final voice in project.voices) {
+        for (final voice in project.voices) {
           voice.project = project;
         }
 
@@ -92,23 +95,23 @@ class MuonProject {
     return null;
   }
 
-  static MuonProject loadFromDir(String projectDir,String projectFileName) {
-    if(Directory(projectDir).existsSync()) {
-      return MuonProject.loadFromFile(projectDir + "/" + projectFileName);
+  static MuonProject loadFromDir(String projectDir, String projectFileName) {
+    if (Directory(projectDir).existsSync()) {
+      return MuonProject.loadFromFile("$projectDir/$projectFileName");
     }
 
     return null;
   }
 
   void save() {
-    if(!Directory(projectDir).existsSync()) {
+    if (!Directory(projectDir).existsSync()) {
       Directory(projectDir).createSync();
     }
 
-    final jsonContents = this.toJson();
+    final jsonContents = toJson();
     String fileContents = jsonEncode(jsonContents);
 
-    final file = new File(projectDir + "/" + projectFileName);
+    final file = File("$projectDir/$projectFileName");
     file.writeAsStringSync(fileContents);
   }
 }

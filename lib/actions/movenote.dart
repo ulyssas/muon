@@ -1,35 +1,34 @@
-import 'dart:math';
+import "dart:math";
 
-import 'package:muon/actions/base.dart';
-import 'package:muon/controllers/muonnote.dart';
+import "package:muon/actions/base.dart";
+import "package:muon/controllers/muonnote.dart";
 
 String upDown(int val) {
-  if(val >= 0) {
+  if (val >= 0) {
     return "up";
-  }
-  else {
+  } else {
     return "down";
   }
 }
 
 class MoveNoteAction extends MuonAction {
+  @override
   String get title {
-    if(notes.length > 1) {
+    if (notes.length > 1) {
       return "Move ${notes.length} notes";
-    }
-    else {
+    } else {
       return "Move note";
     }
   }
+
+  @override
   String get subtitle {
     final fixedTimeDelta = fixTimeDelta(timeDeltaMax);
-    if((fixedTimeDelta != 0) && (semitoneDeltaMax != 0)) {
+    if ((fixedTimeDelta != 0) && (semitoneDeltaMax != 0)) {
       return "${upDown(fixedTimeDelta)} ${fixedTimeDelta.abs()} time units and ${upDown(semitoneDeltaMax)} ${semitoneDeltaMax.abs()} semitones";
-    }
-    else if(timeDeltaMax != 0) {
+    } else if (timeDeltaMax != 0) {
       return "${upDown(fixedTimeDelta)} ${fixedTimeDelta.abs()} time units";
-    }
-    else if(semitoneDeltaMax != 0) {
+    } else if (semitoneDeltaMax != 0) {
       return "${upDown(semitoneDeltaMax)} ${semitoneDeltaMax.abs()} semitones";
     }
 
@@ -45,31 +44,36 @@ class MoveNoteAction extends MuonAction {
 
   int cachedProjectTimeUnitsPerBeat;
 
-  int fixTimeDelta(int timeDelta) => ((timeDelta * notes.first.voice.project.timeUnitsPerBeat) ~/ cachedProjectTimeUnitsPerBeat);
+  int fixTimeDelta(int timeDelta) =>
+      ((timeDelta * notes.first.voice.project.timeUnitsPerBeat) ~/
+          cachedProjectTimeUnitsPerBeat);
 
-  MoveNoteAction(this.notes,this.timeDelta,this.semitoneDelta) {
-    assert(this.notes.isNotEmpty);
+  MoveNoteAction(this.notes, this.timeDelta, this.semitoneDelta) {
+    assert(notes.isNotEmpty);
     cachedProjectTimeUnitsPerBeat = notes.first.voice.project.timeUnitsPerBeat;
   }
 
+  @override
   void perform() {
-    for(int i=0;i < notes.length;i++) {
+    for (int i = 0; i < notes.length; i++) {
       final note = notes[i];
       note.startAtTime += fixTimeDelta(timeDelta[i]);
       note.addSemitones(semitoneDelta[i]);
     }
   }
 
+  @override
   void undo() {
-    for(int i=0;i < notes.length;i++) {
+    for (int i = 0; i < notes.length; i++) {
       final note = notes[i];
-      note.startAtTime = max(0,note.startAtTime - fixTimeDelta(timeDelta[i]));
+      note.startAtTime = max(0, note.startAtTime - fixTimeDelta(timeDelta[i]));
       note.addSemitones(-semitoneDelta[i]);
     }
   }
-  
+
+  @override
   void markVoiceModified() {
-    for(final note in notes) {
+    for (final note in notes) {
       note.voice.hasChangedNoteData = true;
     }
   }

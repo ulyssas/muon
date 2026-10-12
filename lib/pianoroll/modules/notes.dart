@@ -1,28 +1,41 @@
-import 'dart:math';
+import "dart:math";
 
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
-import 'package:muon/actions/cutnote.dart';
-import 'package:muon/actions/deletenote.dart';
-import 'package:muon/actions/movenote.dart';
-import 'package:muon/actions/pastenote.dart';
-import 'package:muon/actions/renamenote.dart';
-import 'package:muon/actions/retimenote.dart';
-import 'package:muon/controllers/muonnote.dart';
-import 'package:muon/controllers/muonvoice.dart';
-import 'package:muon/editor.dart';
-import 'package:muon/helpers.dart';
-import 'package:muon/logic/japanese.dart';
-import 'package:muon/pianoroll/pianoroll.dart';
-import 'package:muon/serializable/muon.dart';
-import 'package:synaps_flutter/synaps_flutter.dart';
+import "package:flutter/material.dart";
+import "package:flutter/rendering.dart";
+import "package:flutter/services.dart";
+import "package:muon/actions/cutnote.dart";
+import "package:muon/actions/deletenote.dart";
+import "package:muon/actions/movenote.dart";
+import "package:muon/actions/pastenote.dart";
+import "package:muon/actions/renamenote.dart";
+import "package:muon/actions/retimenote.dart";
+import "package:muon/controllers/muonnote.dart";
+import "package:muon/controllers/muonvoice.dart";
+import "package:muon/editor.dart";
+import "package:muon/helpers.dart";
+import "package:muon/logic/japanese.dart";
+import "package:muon/pianoroll/pianoroll.dart";
+import "package:muon/serializable/muon.dart";
+import "package:synaps_flutter/synaps_flutter.dart";
 
 int _toAbsoluteSemitones(String note, int octave) {
-  const midiNotes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+  const midiNotes = [
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+    "A",
+    "A#",
+    "B"
+  ];
 
   final currentNoteID = midiNotes.indexOf(note);
-  
+
   return octave * 12 + currentNoteID;
 }
 
@@ -38,8 +51,8 @@ class PianoRollNotesModule extends PianoRollModule {
 
   List<MuonNoteController> getSelectedNotesAsList() {
     final otherNotes = <MuonNoteController>[];
-    for(final selectedNote in selectedNotes.keys) {
-      if(selectedNotes[selectedNote]) {
+    for (final selectedNote in selectedNotes.keys) {
+      if (selectedNotes[selectedNote]) {
         otherNotes.add(selectedNote);
       }
     }
@@ -69,7 +82,7 @@ class PianoRollNotesModule extends PianoRollModule {
       for (final note in voice.notes) {
         final noteRect = getNoteRect(note);
 
-        if(noteRect.contains(Offset(canvasPos.x,canvasPos.y))) {
+        if (noteRect.contains(Offset(canvasPos.x, canvasPos.y))) {
           return note;
         }
       }
@@ -100,231 +113,229 @@ class PianoRollNotesModule extends PianoRollModule {
     return out;
   }
 
+  @override
   bool hitTest(Point point) {
     final noteAtCursor = getNoteAtScreenPos(point);
 
-    if(noteAtCursor != null) {
-      return true;
-    }
+    return true;
 
     return false;
   }
 
+  @override
   void onHover(PointerEvent mouseEvent) {
-    final mousePos = Point(mouseEvent.localPosition.dx,mouseEvent.localPosition.dy);
+    final mousePos =
+        Point(mouseEvent.localPosition.dx, mouseEvent.localPosition.dy);
     final noteAtCursor = getNoteAtScreenPos(mousePos);
-    
-    if(noteAtCursor != null) {
-      var mouseBeats = painter.getBeatNumAtCursor(mousePos.x);
-      var endBeat = (noteAtCursor.startAtTime + noteAtCursor.duration) / project.timeUnitsPerBeat;
 
-      var cursorBeatEndDistance = (endBeat - mouseBeats) * painter.xScale * painter.pixelsPerBeat;
+    var mouseBeats = painter.getBeatNumAtCursor(mousePos.x);
+    var endBeat = (noteAtCursor.startAtTime + noteAtCursor.duration) /
+        project.timeUnitsPerBeat;
 
-      if(cursorBeatEndDistance < 15) {
-        state.setCursor(SystemMouseCursors.resizeLeftRight);
-      }
-      else {
-        state.setCursor(SystemMouseCursors.click);
-      }
-    }
-    else {
-      state.setCursor(MouseCursor.defer);
+    var cursorBeatEndDistance =
+        (endBeat - mouseBeats) * painter.xScale * painter.pixelsPerBeat;
+
+    if (cursorBeatEndDistance < 15) {
+      state.setCursor(SystemMouseCursors.resizeLeftRight);
+    } else {
+      state.setCursor(SystemMouseCursors.click);
     }
   }
 
+  @override
   void onClick(PointerEvent mouseEvent, int numClicks) {
-    final mousePos = Point(mouseEvent.localPosition.dx,mouseEvent.localPosition.dy);
+    final mousePos =
+        Point(mouseEvent.localPosition.dx, mouseEvent.localPosition.dy);
     // onClick
     final noteAtCursor = getNoteAtScreenPos(mousePos);
 
-    if(!RawKeyboard.instance.physicalKeysPressed.contains(PhysicalKeyboardKey.shiftLeft)) {
-      selectedNotes.forEach((note,isActive) {selectedNotes[note] = false;});
+    if (!RawKeyboard.instance.physicalKeysPressed
+        .contains(PhysicalKeyboardKey.shiftLeft)) {
+      selectedNotes.forEach((note, isActive) {
+        selectedNotes[note] = false;
+      });
     }
 
-    if(numClicks == 1) {
-      if(noteAtCursor != null) {
-        if(selectedNotes[noteAtCursor] == null) {
-          selectedNotes[noteAtCursor] = false;
-        }
-        selectedNotes[noteAtCursor] = !selectedNotes[noteAtCursor];
+    if (numClicks == 1) {
+      if (selectedNotes[noteAtCursor] == null) {
+        selectedNotes[noteAtCursor] = false;
       }
-      else {
-        project.playheadTime = (painter.getBeatNumAtCursor(mousePos.x) * project.timeUnitsPerBeat).roundToDouble() / project.timeUnitsPerBeat;
-      }
-    }
-    else if(numClicks == 2) {
-      if(noteAtCursor != null) {
-        selectedNotes[noteAtCursor] = true;
+      selectedNotes[noteAtCursor] = !selectedNotes[noteAtCursor];
+    } else if (numClicks == 2) {
+      selectedNotes[noteAtCursor] = true;
 
-        // edit note lyrics
-        final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+      // edit note lyrics
+      final RenderBox overlay = Overlay.of(context).context.findRenderObject();
 
-        final initialLyricValue = noteAtCursor.lyric;
-        final textController = TextEditingController(text: initialLyricValue);
-        textController.selection = TextSelection(baseOffset: 0, extentOffset: initialLyricValue.length);
+      final initialLyricValue = noteAtCursor.lyric;
+      final textController = TextEditingController(text: initialLyricValue);
+      textController.selection =
+          TextSelection(baseOffset: 0, extentOffset: initialLyricValue.length);
 
-        final editHistory = Map<int,String>();
+      final editHistory = <int, String>{};
 
-        String lastInput = "";
-        final newNoteLyrics = <MuonNoteController,String>{};
+      String lastInput = "";
+      final newNoteLyrics = <MuonNoteController, String>{};
 
-        showMenu<void>(
-          context: context,
-          position: RelativeRect.fromRect(
-              mouseEvent.position & Size(40, 40), // smaller rect, the touch area
-              Offset.zero & overlay.size // Bigger rect, the entire screen
+      showMenu<void>(
+        context: context,
+        position: RelativeRect.fromRect(
+            mouseEvent.position & Size(40, 40), // smaller rect, the touch area
+            Offset.zero & overlay.size // Bigger rect, the entire screen
             ),
-          items: [
-            PopupMenuItem(
-              child: TextField(
-                controller: textController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: "Lyrics",
-                ),
-                autofocus: true,
-                
-                onChanged: (String text) {
-                  final hiraganaList = JapaneseUTF8.alphabetToHiragana(text);
-
-                  noteAtCursor.voice.sortNotesByTime();
-                  lastInput = hiraganaList.join("");
-
-                  newNoteLyrics.clear();
-
-                  final curNotePos = noteAtCursor.voice.notes.indexOf(noteAtCursor);
-                  for(int i=curNotePos;i < noteAtCursor.voice.notes.length;i++) {
-                    if((i - curNotePos) < hiraganaList.length) {
-                      if(!editHistory.containsKey(i)) {
-                        editHistory[i] = noteAtCursor.voice.notes[i].lyric;
-                      }
-                      noteAtCursor.voice.notes[i].lyric = hiraganaList[i - curNotePos];
-                      newNoteLyrics[noteAtCursor.voice.notes[i]] = hiraganaList[i - curNotePos];
-                    }
-                    else if(editHistory.containsKey(i)) {
-                      noteAtCursor.voice.notes[i].lyric = editHistory[i];
-                    }
-                  }
-
-                  if(hiraganaList.length == 0) {
-                    // short cut: just remove the lyrics to the current note
-                    if(!editHistory.containsKey(curNotePos)) {
-                      editHistory[curNotePos] = noteAtCursor.lyric;
-                    }
-                    noteAtCursor.lyric = "";
-                  }
-                },
+        items: [
+          PopupMenuItem(
+            child: TextField(
+              controller: textController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: "Lyrics",
               ),
+              autofocus: true,
+              onChanged: (String text) {
+                final hiraganaList = JapaneseUTF8.alphabetToHiragana(text);
+
+                noteAtCursor.voice.sortNotesByTime();
+                lastInput = hiraganaList.join("");
+
+                newNoteLyrics.clear();
+
+                final curNotePos =
+                    noteAtCursor.voice.notes.indexOf(noteAtCursor);
+                for (int i = curNotePos;
+                    i < noteAtCursor.voice.notes.length;
+                    i++) {
+                  if ((i - curNotePos) < hiraganaList.length) {
+                    if (!editHistory.containsKey(i)) {
+                      editHistory[i] = noteAtCursor.voice.notes[i].lyric;
+                    }
+                    noteAtCursor.voice.notes[i].lyric =
+                        hiraganaList[i - curNotePos];
+                    newNoteLyrics[noteAtCursor.voice.notes[i]] =
+                        hiraganaList[i - curNotePos];
+                  } else if (editHistory.containsKey(i)) {
+                    noteAtCursor.voice.notes[i].lyric = editHistory[i];
+                  }
+                }
+
+                if (hiraganaList.isEmpty) {
+                  // short cut: just remove the lyrics to the current note
+                  if (!editHistory.containsKey(curNotePos)) {
+                    editHistory[curNotePos] = noteAtCursor.lyric;
+                  }
+                  noteAtCursor.lyric = "";
+                }
+              },
             ),
-          ],
-          elevation: 8.0,
-        ).then((_) {
-          final originalNoteLyrics = <MuonNoteController,String>{};
+          ),
+        ],
+        elevation: 8.0,
+      ).then((_) {
+        final originalNoteLyrics = <MuonNoteController, String>{};
 
-          for(final editedNote in newNoteLyrics.keys) {
-            final notePos = noteAtCursor.voice.notes.indexOf(editedNote);
-            originalNoteLyrics[editedNote] = editHistory[notePos] ?? newNoteLyrics[editedNote];
-          }
-
-          final action = RenameNoteAction(newNoteLyrics, originalNoteLyrics, lastInput);
-
-          if(newNoteLyrics.isNotEmpty) {
-            project.addAction(action);
-          }
-        });
-      }
-      else {
-        if(project.voices.length > project.currentVoiceID) {
-          MuonVoiceController voice = project.voices[project.currentVoiceID];
-          var note = MuonNoteController().ctx();
-          var pitch = painter.getPitchAtCursor(mousePos.y);
-          note.octave = pitch.octave;
-          note.note = pitch.note;
-          note.startAtTime = (painter.getBeatNumAtCursor(mousePos.x) * project.timeUnitsPerBeat).floor();
-          note.startAtTime = floorToModulus(note.startAtTime, project.timeUnitsPerSubdivision);
-          note.duration = project.timeUnitsPerSubdivision;
-          voice.addNote(note);
+        for (final editedNote in newNoteLyrics.keys) {
+          final notePos = noteAtCursor.voice.notes.indexOf(editedNote);
+          originalNoteLyrics[editedNote] =
+              editHistory[notePos] ?? newNoteLyrics[editedNote];
         }
-      }
+
+        final action =
+            RenameNoteAction(newNoteLyrics, originalNoteLyrics, lastInput);
+
+        if (newNoteLyrics.isNotEmpty) {
+          project.addAction(action);
+        }
+      });
     }
   }
 
+  @override
   void onDragStart(PointerEvent mouseEvent, Point mouseStartPos) {
     final noteAtCursor = getNoteAtScreenPos(mouseStartPos);
-
-    // this should never happen?
-    if(noteAtCursor == null) {return;}
 
     _internalDragFirstNote = noteAtCursor;
 
     noteDragOriginalData = {};
     noteDragOriginalData[noteAtCursor] = noteAtCursor.toSerializable();
 
-    for(final note in selectedNotes.keys) {
-      if(selectedNotes[note]) {
+    for (final note in selectedNotes.keys) {
+      if (selectedNotes[note]) {
         noteDragOriginalData[note] = note.toSerializable();
       }
     }
   }
 
+  @override
   void onDragging(PointerEvent mouseEvent, Point mouseStartPos) {
-    if(_internalDragFirstNote == null) {return;}
-
     final note = _internalDragFirstNote;
-    final mousePos = Point(mouseEvent.localPosition.dx,mouseEvent.localPosition.dy);
+    final mousePos =
+        Point(mouseEvent.localPosition.dx, mouseEvent.localPosition.dy);
 
-    if(!RawKeyboard.instance.physicalKeysPressed.contains(PhysicalKeyboardKey.shiftLeft)) {
-      if(selectedNotes[note] != true) {
-        selectedNotes.forEach((note,isActive) {selectedNotes[note] = false;});
+    if (!RawKeyboard.instance.physicalKeysPressed
+        .contains(PhysicalKeyboardKey.shiftLeft)) {
+      if (selectedNotes[note] != true) {
+        selectedNotes.forEach((note, isActive) {
+          selectedNotes[note] = false;
+        });
       }
     }
 
     selectedNotes[note] = true;
-    
+
     var originalFirstNote = noteDragOriginalData[note];
     var mouseBeats = painter.getBeatNumAtCursor(mouseStartPos.x);
-    var endBeat = (originalFirstNote.startAtTime + originalFirstNote.duration) / project.timeUnitsPerBeat;
+    var endBeat = (originalFirstNote.startAtTime + originalFirstNote.duration) /
+        project.timeUnitsPerBeat;
 
-    var cursorBeatEndDistance = (endBeat - mouseBeats) * painter.xScale * painter.pixelsPerBeat;
+    var cursorBeatEndDistance =
+        (endBeat - mouseBeats) * painter.xScale * painter.pixelsPerBeat;
 
     bool resizeMode = cursorBeatEndDistance < 15;
 
     final mousePitch = painter.getPitchAtCursor(mousePos.y);
-    final deltaSemiTones = _toAbsoluteSemitones(mousePitch.note,mousePitch.octave) - _toAbsoluteSemitones(originalFirstNote.note,originalFirstNote.octave);
+    final deltaSemiTones = _toAbsoluteSemitones(
+            mousePitch.note, mousePitch.octave) -
+        _toAbsoluteSemitones(originalFirstNote.note, originalFirstNote.octave);
 
     final mouseBeatNum = painter.getBeatNumAtCursor(mousePos.x);
-    final mouseBeatSubDivNum =
-        ((mouseBeatNum * project.timeUnitsPerBeat) ~/ project.timeUnitsPerSubdivision);
+    final mouseBeatSubDivNum = ((mouseBeatNum * project.timeUnitsPerBeat) ~/
+        project.timeUnitsPerSubdivision);
     final originalMouseBeatNum = painter.getBeatNumAtCursor(mouseStartPos.x);
     final originalMouseBeatSubDivNum =
-        ((originalMouseBeatNum * project.timeUnitsPerBeat) ~/ project.timeUnitsPerSubdivision);
-    
+        ((originalMouseBeatNum * project.timeUnitsPerBeat) ~/
+            project.timeUnitsPerSubdivision);
+
     final deltaSubDiv = mouseBeatSubDivNum - originalMouseBeatSubDivNum;
     final deltaSegments = deltaSubDiv * project.timeUnitsPerSubdivision;
 
     var resizeDelta = deltaSegments;
-    if(state.isShiftKeyHeld) {
+    if (state.isShiftKeyHeld) {
       resizeDelta = deltaSegments + project.timeUnitsPerSubdivision;
     }
 
-    for(final selectedNote in selectedNotes.keys) {
-      if(selectedNotes[selectedNote]) {
-        if(noteDragOriginalData[selectedNote] != null) {
-          if(resizeMode) {
-            selectedNote.duration = noteDragOriginalData[selectedNote].duration + resizeDelta;
-            if(state.isShiftKeyHeld) {
-              selectedNote.duration = max(project.timeUnitsPerSubdivision,floorToModulus(selectedNote.duration, project.timeUnitsPerSubdivision));
+    for (final selectedNote in selectedNotes.keys) {
+      if (selectedNotes[selectedNote]) {
+        if (noteDragOriginalData[selectedNote] != null) {
+          if (resizeMode) {
+            selectedNote.duration =
+                noteDragOriginalData[selectedNote].duration + resizeDelta;
+            if (state.isShiftKeyHeld) {
+              selectedNote.duration = max(
+                  project.timeUnitsPerSubdivision,
+                  floorToModulus(
+                      selectedNote.duration, project.timeUnitsPerSubdivision));
+            } else {
+              selectedNote.duration =
+                  max(project.timeUnitsPerSubdivision, selectedNote.duration);
             }
-            else {
-              selectedNote.duration = max(project.timeUnitsPerSubdivision,selectedNote.duration);
+          } else {
+            selectedNote.startAtTime = max(0,
+                noteDragOriginalData[selectedNote].startAtTime + deltaSegments);
+            if (state.isShiftKeyHeld) {
+              selectedNote.startAtTime = floorToModulus(
+                  selectedNote.startAtTime, project.timeUnitsPerSubdivision);
             }
-          }
-          else {
-            selectedNote.startAtTime = max(0,noteDragOriginalData[selectedNote].startAtTime + deltaSegments);
-            if(state.isShiftKeyHeld) {
-              selectedNote.startAtTime = floorToModulus(selectedNote.startAtTime, project.timeUnitsPerSubdivision);
-            }
-            
+
             selectedNote.note = noteDragOriginalData[selectedNote].note;
             selectedNote.octave = noteDragOriginalData[selectedNote].octave;
             selectedNote.addSemitones(deltaSemiTones.floor());
@@ -336,42 +347,45 @@ class PianoRollNotesModule extends PianoRollModule {
     project.playheadTime = note.startAtTime / project.timeUnitsPerBeat;
   }
 
+  @override
   void onDragEnd(PointerEvent mouseEvent, Point mouseStartPos) {
-    if(_internalDragFirstNote != null) {
-      final timeDeltas = <int>[];
-      final semitoneDeltas = <int>[];
-      final durationDeltas = <int>[];
-      final notes = <MuonNoteController>[];
+    final timeDeltas = <int>[];
+    final semitoneDeltas = <int>[];
+    final durationDeltas = <int>[];
+    final notes = <MuonNoteController>[];
 
-      for(final otherNote in selectedNotes.keys) {
-        if(selectedNotes[otherNote]) {
-          notes.add(otherNote);
-          timeDeltas.add(otherNote.startAtTime - noteDragOriginalData[otherNote].startAtTime);
-          semitoneDeltas.add(otherNote.toAbsoluteSemitones() - _toAbsoluteSemitones(noteDragOriginalData[otherNote].note,noteDragOriginalData[otherNote].octave));
-          durationDeltas.add(otherNote.duration - noteDragOriginalData[otherNote].duration);
-        }
+    for (final otherNote in selectedNotes.keys) {
+      if (selectedNotes[otherNote]) {
+        notes.add(otherNote);
+        timeDeltas.add(otherNote.startAtTime -
+            noteDragOriginalData[otherNote].startAtTime);
+        semitoneDeltas.add(otherNote.toAbsoluteSemitones() -
+            _toAbsoluteSemitones(noteDragOriginalData[otherNote].note,
+                noteDragOriginalData[otherNote].octave));
+        durationDeltas
+            .add(otherNote.duration - noteDragOriginalData[otherNote].duration);
       }
+    }
 
-      final maxTimeDelta = timeDeltas.reduce(max);
-      final maxSemitoneDelta = semitoneDeltas.reduce(max);
-      final maxDurationDelta = durationDeltas.reduce(max);
+    final maxTimeDelta = timeDeltas.reduce(max);
+    final maxSemitoneDelta = semitoneDeltas.reduce(max);
+    final maxDurationDelta = durationDeltas.reduce(max);
 
-      if((maxTimeDelta != 0) || (maxSemitoneDelta != 0)) {
-        final action = MoveNoteAction(notes,timeDeltas,semitoneDeltas);
+    if ((maxTimeDelta != 0) || (maxSemitoneDelta != 0)) {
+      final action = MoveNoteAction(notes, timeDeltas, semitoneDeltas);
 
-        project.addAction(action);
-      }
-      else if(maxDurationDelta != 0) {
-        final action = RetimeNoteAction(notes,durationDeltas);
+      project.addAction(action);
+    } else if (maxDurationDelta != 0) {
+      final action = RetimeNoteAction(notes, durationDeltas);
 
-        project.addAction(action);
-      }
+      project.addAction(action);
     }
 
     noteDragOriginalData.clear();
     _internalDragFirstNote = null;
   }
 
+  @override
   void onSelect(PointerEvent mouseEvent, Rect selectionBox) {
     if (!RawKeyboard.instance.physicalKeysPressed
         .contains(PhysicalKeyboardKey.shiftLeft)) {
@@ -392,20 +406,21 @@ class PianoRollNotesModule extends PianoRollModule {
     }
   }
 
+  @override
   void onKey(RawKeyEvent keyEvent) {
-    if(keyEvent.isControlPressed) {
+    if (keyEvent.isControlPressed) {
       // control key commands
 
-      if(keyEvent.isKeyPressed(LogicalKeyboardKey.keyA)) {
+      if (keyEvent.isKeyPressed(LogicalKeyboardKey.keyA)) {
         // select all
 
-        for(final voice in project.voices) {
-          for(final note in voice.notes) {
+        for (final voice in project.voices) {
+          for (final note in voice.notes) {
             selectedNotes[note] = true;
           }
         }
-      }
-      else if(keyEvent.isKeyPressed(LogicalKeyboardKey.keyC) || keyEvent.isKeyPressed(LogicalKeyboardKey.keyX)) {
+      } else if (keyEvent.isKeyPressed(LogicalKeyboardKey.keyC) ||
+          keyEvent.isKeyPressed(LogicalKeyboardKey.keyX)) {
         // copy / cut
 
         bool cut = keyEvent.isKeyPressed(LogicalKeyboardKey.keyX);
@@ -414,52 +429,52 @@ class PianoRollNotesModule extends PianoRollModule {
 
         final listNotes = <MuonNoteController>[];
 
-        int earliestTime = 2147483647; // assuming int32, I cannot be bothered verifying this
-        for(final selectedNote in selectedNotes.keys) {
-          if(selectedNotes[selectedNote]) {
+        int earliestTime =
+            2147483647; // assuming int32, I cannot be bothered verifying this
+        for (final selectedNote in selectedNotes.keys) {
+          if (selectedNotes[selectedNote]) {
             project.copiedNotesVoices.add(selectedNote.voice);
             project.copiedNotes.add(selectedNote.toSerializable());
-            earliestTime = min(earliestTime,selectedNote.startAtTime);
+            earliestTime = min(earliestTime, selectedNote.startAtTime);
             listNotes.add(selectedNote);
 
-            if(cut) {
+            if (cut) {
               selectedNote.voice.notes.remove(selectedNote);
             }
           }
         }
 
-        for(final note in project.copiedNotes) {
+        for (final note in project.copiedNotes) {
           note.startAtTime -= earliestTime;
         }
 
-        if(project.copiedNotes.isNotEmpty) {
+        if (project.copiedNotes.isNotEmpty) {
           final action = CutNoteAction(listNotes);
 
           project.addAction(action);
         }
-      }
-      else if(keyEvent.isKeyPressed(LogicalKeyboardKey.keyV)) {
+      } else if (keyEvent.isKeyPressed(LogicalKeyboardKey.keyV)) {
         // paste
 
         final listNotes = <MuonNoteController>[];
 
-        for(int idx = 0;idx < project.copiedNotes.length;idx++) {
+        for (int idx = 0; idx < project.copiedNotes.length; idx++) {
           final note = project.copiedNotes[idx];
           final voice = project.copiedNotesVoices[idx];
           final cNote = MuonNoteController.fromSerializable(note);
           listNotes.add(cNote);
-          cNote.startAtTime = cNote.startAtTime + (project.playheadTime * project.timeUnitsPerBeat).floor();
-          if(keyEvent.isShiftPressed) {
-            if(project.currentVoiceID < project.voices.length) {
+          cNote.startAtTime = cNote.startAtTime +
+              (project.playheadTime * project.timeUnitsPerBeat).floor();
+          if (keyEvent.isShiftPressed) {
+            if (project.currentVoiceID < project.voices.length) {
               project.voices[project.currentVoiceID].addNoteInternal(cNote);
             }
-          }
-          else {
+          } else {
             voice.addNoteInternal(cNote);
           }
         }
 
-        if(listNotes.isNotEmpty) {
+        if (listNotes.isNotEmpty) {
           final action = PasteNoteAction(listNotes);
 
           project.addAction(action);
@@ -467,97 +482,94 @@ class PianoRollNotesModule extends PianoRollModule {
       }
     }
 
-    if(keyEvent.isKeyPressed(LogicalKeyboardKey.delete)) {
-      for(final selectedNote in selectedNotes.keys) {
-        if(selectedNotes[selectedNote]) {
+    if (keyEvent.isKeyPressed(LogicalKeyboardKey.delete)) {
+      for (final selectedNote in selectedNotes.keys) {
+        if (selectedNotes[selectedNote]) {
           selectedNote.voice.notes.remove(selectedNote);
         }
       }
 
       final noteList = getSelectedNotesAsList();
-      if(noteList.isNotEmpty) {
+      if (noteList.isNotEmpty) {
         final action = DeleteNoteAction(noteList);
         project.addAction(action);
 
         selectedNotes.clear();
       }
-    }
-    else if(keyEvent.isKeyPressed(LogicalKeyboardKey.arrowUp)) {
+    } else if (keyEvent.isKeyPressed(LogicalKeyboardKey.arrowUp)) {
       int moveBy = keyEvent.isShiftPressed ? 12 : 1;
 
       MuonNoteController lastNote;
-      for(final selectedNote in selectedNotes.keys) {
-        if(selectedNotes[selectedNote]) {
+      for (final selectedNote in selectedNotes.keys) {
+        if (selectedNotes[selectedNote]) {
           selectedNote.addSemitones(moveBy);
           lastNote = selectedNote;
         }
       }
-      
-      if(lastNote != null) {
-        final notes = getSelectedNotesAsList();
-        final action = MoveNoteAction(notes,List.filled(notes.length,0),List.filled(notes.length,moveBy));
 
-        project.addAction(action);
-      }
-    }
-    else if(keyEvent.isKeyPressed(LogicalKeyboardKey.arrowDown)) {
+      final notes = getSelectedNotesAsList();
+      final action = MoveNoteAction(notes, List.filled(notes.length, 0),
+          List.filled(notes.length, moveBy));
+
+      project.addAction(action);
+    } else if (keyEvent.isKeyPressed(LogicalKeyboardKey.arrowDown)) {
       int moveBy = keyEvent.isShiftPressed ? -12 : -1;
 
       MuonNoteController lastNote;
-      for(final selectedNote in selectedNotes.keys) {
-        if(selectedNotes[selectedNote]) {
+      for (final selectedNote in selectedNotes.keys) {
+        if (selectedNotes[selectedNote]) {
           selectedNote.addSemitones(moveBy);
           lastNote = selectedNote;
         }
       }
-      
-      if(lastNote != null) {
-        final notes = getSelectedNotesAsList();
-        final action = MoveNoteAction(notes,List.filled(notes.length,0),List.filled(notes.length,moveBy));
 
-        print("Action added");
+      final notes = getSelectedNotesAsList();
+      final action = MoveNoteAction(notes, List.filled(notes.length, 0),
+          List.filled(notes.length, moveBy));
 
-        project.addAction(action);
-      }
-    }
-    else if(keyEvent.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
-      int moveBy = keyEvent.isShiftPressed ? project.timeUnitsPerBeat : project.timeUnitsPerSubdivision;
+      print("Action added");
+
+      project.addAction(action);
+    } else if (keyEvent.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
+      int moveBy = keyEvent.isShiftPressed
+          ? project.timeUnitsPerBeat
+          : project.timeUnitsPerSubdivision;
 
       MuonNoteController lastNote;
-      for(final selectedNote in selectedNotes.keys) {
-        if(selectedNotes[selectedNote]) {
+      for (final selectedNote in selectedNotes.keys) {
+        if (selectedNotes[selectedNote]) {
           selectedNote.startAtTime = selectedNote.startAtTime + moveBy;
           lastNote = selectedNote;
         }
       }
-      
-      if(lastNote != null) {
-        final notes = getSelectedNotesAsList();
-        final action = MoveNoteAction(notes,List.filled(notes.length,moveBy),List.filled(notes.length,0));
 
-        project.addAction(action);
-      }
-    }
-    else if(keyEvent.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
-      int moveBy = keyEvent.isShiftPressed ? -project.timeUnitsPerBeat : -project.timeUnitsPerSubdivision;
+      final notes = getSelectedNotesAsList();
+      final action = MoveNoteAction(notes, List.filled(notes.length, moveBy),
+          List.filled(notes.length, 0));
+
+      project.addAction(action);
+    } else if (keyEvent.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
+      int moveBy = keyEvent.isShiftPressed
+          ? -project.timeUnitsPerBeat
+          : -project.timeUnitsPerSubdivision;
 
       MuonNoteController lastNote;
-      for(final selectedNote in selectedNotes.keys) {
-        if(selectedNotes[selectedNote]) {
-          selectedNote.startAtTime = max(0,selectedNote.startAtTime + moveBy);
+      for (final selectedNote in selectedNotes.keys) {
+        if (selectedNotes[selectedNote]) {
+          selectedNote.startAtTime = max(0, selectedNote.startAtTime + moveBy);
           lastNote = selectedNote;
         }
       }
-      
-      if(lastNote != null) {
-        final notes = getSelectedNotesAsList();
-        final action = MoveNoteAction(notes,List.filled(notes.length,moveBy),List.filled(notes.length,0));
 
-        project.addAction(action);
-      }
+      final notes = getSelectedNotesAsList();
+      final action = MoveNoteAction(notes, List.filled(notes.length, moveBy),
+          List.filled(notes.length, 0));
+
+      project.addAction(action);
     }
   }
 
+  @override
   void paint(Canvas canvas, Size size) {
     final themeData = painter.themeData;
     final pixelsPerBeat = painter.pixelsPerBeat;
@@ -575,10 +587,10 @@ class PianoRollNotesModule extends PianoRollModule {
           if (themeData.brightness == Brightness.dark) {
             canvas.drawRect(noteRect, Paint()..color = Colors.white);
             canvas.drawRect(
-                noteRect, Paint()..color = noteColor.withOpacity(0.75));
+                noteRect, Paint()..color = noteColor.withValues(alpha: 0.75));
           } else {
             canvas.drawRect(
-                noteRect, Paint()..color = noteColor.withOpacity(0.5));
+                noteRect, Paint()..color = noteColor.withValues(alpha: 0.5));
           }
 
           canvas.drawRect(painter.deflateScaled(noteRect, borderThickness),
@@ -589,7 +601,7 @@ class PianoRollNotesModule extends PianoRollModule {
           } else {
             canvas.drawRect(noteRect, Paint()..color = Colors.black);
             canvas.drawRect(
-                noteRect, Paint()..color = noteColor.withOpacity(0.95));
+                noteRect, Paint()..color = noteColor.withValues(alpha: 0.95));
           }
         }
       }
@@ -598,8 +610,8 @@ class PianoRollNotesModule extends PianoRollModule {
     for (final voice in project.voices) {
       for (final note in voice.notes) {
         if (note.lyric != "") {
-          TextSpan lyricSpan = new TextSpan(
-              style: new TextStyle(
+          TextSpan lyricSpan = TextSpan(
+              style: TextStyle(
                   color: themeData.brightness == Brightness.light
                       ? Colors.grey[600]
                       : Colors.grey[300]),
