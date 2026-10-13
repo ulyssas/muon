@@ -10,8 +10,6 @@ import "package:muon/logic/musicxml.dart";
 import "package:muon/serializable/muon.dart";
 import "package:synaps_flutter/synaps_flutter.dart";
 
-part "muonvoice.g.dart";
-
 @Controller()
 class MuonVoiceController with WeakEqualityController {
   MuonProjectController project;
@@ -79,7 +77,7 @@ class MuonVoiceController with WeakEqualityController {
   String get voiceFileName =>
       "${project.projectFileNameNoSpacesNoExt}_${project.voices.indexOf(this)}_voice";
 
-  /// Creates Neutrino-compatible labels for this voice by first exporting
+  /// Creates NEUTRINO-compatible labels for this voice by first exporting
   /// to a MusicXML file, and then running `musicXMLtoLabel.exe`
   Future<void> makeLabels() async {
     final musicXML = exportVoiceToMusicXML();
@@ -117,7 +115,7 @@ class MuonVoiceController with WeakEqualityController {
     });
   }
 
-  /// Generates mgc/bap/f0 files by executing Neutrino
+  /// Generates mgc/bap/f0 files by executing NEUTRINO
   /// Requires labels to be already generated, and currently does
   /// not check whether labels already exist!
   ///

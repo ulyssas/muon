@@ -6,9 +6,7 @@ import "package:muon/main.dart";
 import "package:synaps_flutter/synaps_flutter.dart";
 
 class MuonAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const MuonAppBar({
-    Key key,
-  }) : super(key: key);
+  const MuonAppBar({super.key});
 
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);

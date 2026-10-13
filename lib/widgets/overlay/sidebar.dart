@@ -4,9 +4,7 @@ import "package:muon/widgets/overlay/projectmetadatamenu.dart";
 import "package:muon/widgets/overlay/voicesmenu.dart";
 
 class MuonSidebar extends StatelessWidget {
-  const MuonSidebar({
-    Key key,
-  }) : super(key: key);
+  const MuonSidebar({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -14,7 +14,7 @@ class MuonWelcomeDialog extends StatelessWidget {
         content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
-              RaisedButton(
+              ElevatedButton(
                   child: Text("Create New Project"),
                   onPressed: () async {
                     final suc = await MuonEditor.createNewProject();
@@ -23,7 +23,7 @@ class MuonWelcomeDialog extends StatelessWidget {
                     }
                   }),
               SizedBox(height: 10),
-              RaisedButton(
+              ElevatedButton(
                   child: Text("Open Project"),
                   onPressed: () async {
                     final suc = await MuonEditor.openProject(context);
@@ -46,7 +46,7 @@ class MuonWelcomeDialog extends StatelessWidget {
               );
             },
           ),
-          OutlineButton(
+          OutlinedButton(
             child: Text("Quit"),
             onPressed: () {
               exit(0);

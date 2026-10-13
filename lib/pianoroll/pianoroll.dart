@@ -86,7 +86,7 @@ abstract class PianoRollModule {
 class PianoRoll extends StatefulWidget {
   const PianoRoll({
     super.key,
-    @required this.project,
+    required this.project,
     this.onHover,
     this.onClick,
     this.onSelect,
@@ -364,10 +364,10 @@ class _PianoRollState extends State<PianoRoll> {
     } else if (pointerMode == _PianoRollPointerMode.SELECTING) {
       lastPointerEvent = details;
       setState(() {
-        var left = min(_firstMouseDownPos.x, details.localPosition.dx);
-        var right = max(_firstMouseDownPos.x, details.localPosition.dx);
-        var top = min(_firstMouseDownPos.y, details.localPosition.dy);
-        var bottom = max(_firstMouseDownPos.y, details.localPosition.dy);
+        var left = min(_firstMouseDownPos.x, details.localPosition.dx).toDouble();
+        var right = max(_firstMouseDownPos.x, details.localPosition.dx).toDouble();
+        var top = min(_firstMouseDownPos.y, details.localPosition.dy).toDouble();
+        var bottom = max(_firstMouseDownPos.y, details.localPosition.dy).toDouble();
         selectionRect = Rect.fromLTRB(left, top, right, bottom);
 
         widget.onSelect(controls, details, selectionRect);
@@ -729,11 +729,11 @@ class PianoRollPainter extends CustomPainter {
     // draw pitch grid
     Paint pitchGridDiv = Paint()
       ..color = themeData.brightness == Brightness.light
-          ? Colors.grey[200]
-          : Colors.grey[600];
+          ? Colors.grey.shade200
+          : Colors.grey.shade600;
     Paint pitchGridOctaveDiv = Paint()
       ..color = themeData.brightness == Brightness.light
-          ? Colors.grey[400]
+          ? Colors.grey.shade400
           : Colors.white;
     double firstVisibleKey = (yPos / 20).floorToDouble();
     int visibleKeys = ((size.height / yScale) / 20).floor();
@@ -754,12 +754,12 @@ class PianoRollPainter extends CustomPainter {
     // draw time grid
     Paint subBeatDiv = Paint()
       ..color = themeData.brightness == Brightness.light
-          ? Colors.grey[200]
-          : Colors.grey[800];
+          ? Colors.grey.shade200
+          : Colors.grey.shade800;
     Paint beatDiv = Paint()
       ..color = themeData.brightness == Brightness.light
           ? Colors.grey
-          : Colors.grey[600];
+          : Colors.grey.shade600;
     Paint measureDiv = Paint()
       ..color = themeData.brightness == Brightness.light
           ? Colors.black
@@ -846,7 +846,7 @@ class PianoRollPainter extends CustomPainter {
     Paint whiteKeys = Paint()
       ..color = themeData.brightness == Brightness.light
           ? Colors.white
-          : Colors.grey[100];
+          : Colors.grey.shade100;
     Paint blackKeys = Paint()..color = Colors.black;
     List<String> toDraw = [
       "B",

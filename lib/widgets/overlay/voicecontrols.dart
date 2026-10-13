@@ -10,9 +10,9 @@ import "package:synaps_flutter/synaps_flutter.dart";
 
 class MuonVoiceControls extends StatelessWidget {
   const MuonVoiceControls({
-    Key key,
-    @required this.voice,
-  }) : super(key: key);
+    super.key,
+    required this.voice,
+  });
 
   final MuonVoiceController voice;
 
@@ -23,7 +23,7 @@ class MuonVoiceControls extends StatelessWidget {
       height: 40,
       margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       padding: EdgeInsets.only(left: 15),
-      decoration: BoxDecoration(color: themeData.buttonColor, boxShadow: [
+      decoration: BoxDecoration(color: themeData.cardColor, boxShadow: [
         BoxShadow(
           color: Colors.black.withValues(alpha: 0.5),
           blurRadius: 1,

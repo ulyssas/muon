@@ -5,9 +5,7 @@ import "package:muon/editor.dart";
 import "package:synaps_flutter/synaps_flutter.dart";
 
 class MuonProjectMetadataMenu extends StatelessWidget {
-  const MuonProjectMetadataMenu({
-    Key key,
-  }) : super(key: key);
+  const MuonProjectMetadataMenu({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +69,7 @@ class MuonProjectMetadataMenu extends StatelessWidget {
               divisions: 4,
               label: "1 / ${currentProject.beatValue}",
               onChanged: (double value) {
-                currentProject.beatValue = pow(2, value.round());
+                currentProject.beatValue = pow(2, value.round()).toInt();
                 currentProject.markAllVoicesAsChanged();
               },
             )),

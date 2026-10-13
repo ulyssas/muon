@@ -2,7 +2,7 @@ import "dart:async";
 import "dart:io";
 import "dart:math";
 
-import "package:dart_midi/dart_midi.dart";
+import "package:dart_midi_pro/dart_midi_pro.dart";
 import "package:muon/actions/addvoice.dart";
 import "package:muon/actions/base.dart";
 import "package:muon/controllers/muonnote.dart";
@@ -12,8 +12,6 @@ import "package:muon/logic/musicxml.dart";
 import "package:muon/serializable/muon.dart";
 import "package:path/path.dart" as p;
 import "package:synaps_flutter/synaps_flutter.dart";
-
-part "muonproject.g.dart";
 
 ///
 /// The main class where the muon project is stored.

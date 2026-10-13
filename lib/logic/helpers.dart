@@ -5,13 +5,13 @@ import "package:path/path.dart" as p;
 
 class MuonHelpers {
   /// Returns a the absolute path to subdirectory `programName`
-  /// inside the Neutrino directory
+  /// inside the NEUTRINO directory
   static String getRawProgramPath(String subDir) {
     return "${getMuonSettings().neutrinoDir}/$subDir";
   }
 
   /// Returns a the absolute path to subdirectory `programName`
-  /// inside the Neutrino `bin` directory
+  /// inside the NEUTRINO `bin` directory
   static String getProgramPath(String programName) {
     String out = "${getMuonSettings().neutrinoDir}/bin/$programName";
 

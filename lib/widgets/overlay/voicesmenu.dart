@@ -7,9 +7,7 @@ import "package:muon/widgets/overlay/voicecontrols.dart";
 import "package:synaps_flutter/synaps_flutter.dart";
 
 class MuonVoicesMenu extends StatelessWidget {
-  const MuonVoicesMenu({
-    Key key,
-  }) : super(key: key);
+  const MuonVoicesMenu({super.key});
 
   @override
   Widget build(BuildContext context) {

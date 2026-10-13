@@ -40,14 +40,14 @@ class PianoRollWAILAModule extends PianoRollModule {
     // clear all transforms
     canvas.restore();
 
-    final mouseBeatNum = max(0, painter.getBeatNumAtCursor(curMousePos.x));
+    final mouseBeatNum = max(0, painter.getBeatNumAtCursor(curMousePos.x.toDouble()));
     final mouseBeatSubDivNum =
         (((mouseBeatNum * project.timeUnitsPerBeat).floor() %
                     project.timeUnitsPerBeat) ~/
                 project.timeUnitsPerSubdivision) +
             1;
     final mouseMeasureNum = (mouseBeatNum / project.beatsPerMeasure).ceil();
-    final mousePitch = painter.getPitchAtCursor(curMousePos.y);
+    final mousePitch = painter.getPitchAtCursor(curMousePos.y.toDouble());
     var wailaLabelPainter = TextPainter(
       text: TextSpan(
         style: TextStyle(

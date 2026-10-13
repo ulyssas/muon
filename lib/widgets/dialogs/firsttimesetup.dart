@@ -24,12 +24,12 @@ class MuonFirstTimeSetupDialog extends StatelessWidget {
               SizedBox(
                 height: 15,
               ),
-              RaisedButton(
-                child: Text("Choose Neutrino SDK Folder Location"),
+              ElevatedButton(
+                child: Text("Choose NEUTRINO SDK Folder Location"),
                 onPressed: () {
                   FileSelectorPlatform.instance
                       .getDirectoryPath(
-                    confirmButtonText: "Open Neutrino SDK",
+                    confirmButtonText: "Open NEUTRINO SDK",
                   )
                       .catchError((err) {
                     print("internal file browser error: $err");

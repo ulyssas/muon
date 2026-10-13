@@ -6,9 +6,7 @@ import "package:muon/widgets/overlay/actioncontrols.dart";
 import "package:synaps_flutter/synaps_flutter.dart";
 
 class MuonActionsMenu extends StatelessWidget {
-  MuonActionsMenu({
-    Key key,
-  }) : super(key: key);
+  MuonActionsMenu({super.key});
 
   final _controller = ScrollController();
 

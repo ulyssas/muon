@@ -135,19 +135,19 @@ class _NoteResolution {
 ///
 /// The MusicXML class is an approximation of all of the data contained inside
 /// a MusicXML file. It does not completely follow the Music XML spec!
-/// My primary aim was to get an implementation of MusicXML that Neutrino accepts
+/// My primary aim was to get an implementation of MusicXML that NEUTRINO accepts
 /// and making an official spec compatible MusicXML parser and serializer is not
 /// this project's goal.
 ///
 /// That being said, the logic below does generalise well to most common MusicXML
 /// files, and is robust enough to at least parse MusicXML, and serialize data
-/// to a format that Neutrino almost always accepts.
+/// to a format that NEUTRINO almost always accepts.
 ///
 /// NB: When serializing very complicated time intervals, the below logic does not
 /// generate tuplets/etc. and will just fall back to not annotating notes appropriately.
-/// Since Neutrino does not care about having proper annotations and tuplets, this is
+/// Since NEUTRINO does not care about having proper annotations and tuplets, this is
 /// therefore not implemented properly on purpose. The goal of this project is to speak
-/// with Neutrino, and not to speak with something like Musescore.
+/// with NEUTRINO, and not to speak with something like Musescore.
 ///
 class MusicXML {
   /// The list of all events (notes/rests/time data) contained in the MusicXML
@@ -760,7 +760,7 @@ class MusicXMLUtils {
             beatsRemaining = lastBeats.toDouble();
           }
 
-          var writeDur = min(beatsRemaining * lastDivision, duration);
+          var writeDur = min(beatsRemaining * lastDivision, duration).toDouble();
           var noteResolution = resolveNote(writeDur);
 
           curBeat += writeDur / lastDivision;
@@ -826,7 +826,7 @@ class MusicXMLUtils {
             beatsRemaining = lastBeats.toDouble();
           }
 
-          var writeDur = min(beatsRemaining * lastDivision, duration);
+          var writeDur = min(beatsRemaining * lastDivision, duration).toDouble();
           var noteResolution = resolveNote(writeDur);
 
           curBeat += writeDur / lastDivision;

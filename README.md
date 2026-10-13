@@ -1,6 +1,6 @@
 # Muon
 
-A GUI for the [Neutrino neural singing synthesizer](https://n3utrino.work), written in Flutter (and uses [synaps](https://github.com/SwadicalRag/synaps)!).
+A GUI for the [NEUTRINO neural singing synthesizer](https://n3utrino.work), written in Flutter (and uses [synaps](https://github.com/SwadicalRag/synaps)!).
 
 ## Eyecandy / screenshots
 

@@ -46,7 +46,7 @@ class PianoRollNotesModule extends PianoRollModule {
   Map<MuonNoteController, MuonNote> noteDragOriginalData;
 
   PianoRollNotesModule({
-    @required this.selectedNotes,
+    required this.selectedNotes,
   }) : super();
 
   List<MuonNoteController> getSelectedNotesAsList() {
@@ -82,7 +82,7 @@ class PianoRollNotesModule extends PianoRollModule {
       for (final note in voice.notes) {
         final noteRect = getNoteRect(note);
 
-        if (noteRect.contains(Offset(canvasPos.x, canvasPos.y))) {
+        if (noteRect.contains(Offset(canvasPos.x.toDouble(), canvasPos.y.toDouble()))) {
           return note;
         }
       }
@@ -283,7 +283,7 @@ class PianoRollNotesModule extends PianoRollModule {
     selectedNotes[note] = true;
 
     var originalFirstNote = noteDragOriginalData[note];
-    var mouseBeats = painter.getBeatNumAtCursor(mouseStartPos.x);
+    var mouseBeats = painter.getBeatNumAtCursor(mouseStartPos.x.toDouble());
     var endBeat = (originalFirstNote.startAtTime + originalFirstNote.duration) /
         project.timeUnitsPerBeat;
 
@@ -300,7 +300,7 @@ class PianoRollNotesModule extends PianoRollModule {
     final mouseBeatNum = painter.getBeatNumAtCursor(mousePos.x);
     final mouseBeatSubDivNum = ((mouseBeatNum * project.timeUnitsPerBeat) ~/
         project.timeUnitsPerSubdivision);
-    final originalMouseBeatNum = painter.getBeatNumAtCursor(mouseStartPos.x);
+    final originalMouseBeatNum = painter.getBeatNumAtCursor(mouseStartPos.x.toDouble());
     final originalMouseBeatSubDivNum =
         ((originalMouseBeatNum * project.timeUnitsPerBeat) ~/
             project.timeUnitsPerSubdivision);

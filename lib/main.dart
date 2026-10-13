@@ -5,16 +5,19 @@ import "package:muon/controllers/settings.dart";
 import "package:muon/editor.dart";
 import "package:muon/licenses.dart";
 import "package:synaps_flutter/synaps_flutter.dart";
-import "package:window_size/window_size.dart";
+import "package:window_manager/window_manager.dart";
 
 /// Main app settings
 final appSettings = MuonSettingsController().ctx();
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    setWindowTitle("Muon Editor");
-    setWindowMinSize(Size(1280, 720));
+    await windowManager.ensureInitialized();
+    windowManager.setTitle("Muon Editor");
+    windowManager.setSize(const Size(1280, 720));
+    windowManager.setMinimumSize(const Size(1280, 720));
+    windowManager.center();
   }
 
   addLicenses();

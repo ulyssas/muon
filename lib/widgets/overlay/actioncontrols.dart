@@ -5,10 +5,10 @@ import "package:synaps_flutter/synaps_flutter.dart";
 
 class MuonActionControls extends StatelessWidget {
   const MuonActionControls({
-    Key key,
-    @required this.action,
-    @required this.isPerformed,
-  }) : super(key: key);
+    super.key,
+    required this.action,
+    required this.isPerformed,
+  });
 
   final MuonAction action;
   final bool isPerformed;
@@ -22,8 +22,8 @@ class MuonActionControls extends StatelessWidget {
       padding: EdgeInsets.only(left: 15),
       decoration: BoxDecoration(
           color: isPerformed
-              ? themeData.buttonColor.withOpacity(0.9)
-              : themeData.buttonColor.withOpacity(0.3),
+              ? themeData.cardColor.withOpacity(0.9)
+              : themeData.cardColor.withOpacity(0.3),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.5),
