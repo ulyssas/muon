@@ -1,7 +1,7 @@
 import "dart:io";
 
 import "package:flutter/material.dart";
-import "package:flutter_audio_desktop/flutter_audio_desktop.dart";
+import "package:audioplayers/audioplayers.dart";
 import "package:muon/actions/addnote.dart";
 import "package:muon/controllers/muonnote.dart";
 import "package:muon/controllers/muonproject.dart";
@@ -12,7 +12,7 @@ import "package:synaps_flutter/synaps_flutter.dart";
 
 @Controller()
 class MuonVoiceController with WeakEqualityController {
-  MuonProjectController project;
+  late MuonProjectController project;
 
   /// Folder name of the voice model this voice uses
   @Observable()
@@ -208,27 +208,31 @@ class MuonVoiceController with WeakEqualityController {
     });
   }
 
-  AudioPlayer audioPlayer;
+  AudioPlayer? audioPlayer;
   int audioPlayerDuration = 0;
-  Future<AudioPlayer> getAudioPlayer([Duration playPos]) async {
+  Future<AudioPlayer?> getAudioPlayer([Duration? playPos]) async {
     final voiceID = project.voices.indexOf(this);
-    audioPlayer ??= AudioPlayer(id: voiceID);
+    audioPlayer ??= AudioPlayer(playerId: voiceID.toString());
 
-    await audioPlayer.unload();
-    final suc = await audioPlayer
-        .load(project.getProjectFilePath("audio/${voiceFileName}_world.wav"));
+    await audioPlayer!.stop();
 
-    audioPlayerDuration = (await audioPlayer.getDuration()).inMilliseconds;
-    audioPlayer.setPosition(playPos ?? Duration(seconds: 2));
+    final wavPath = project.getProjectFilePath("audio/${voiceFileName}_world.wav");
+    try {
+      await audioPlayer!.setSource(DeviceFileSource(wavPath));
 
-    if (!suc) {
+      final duration = await audioPlayer!.getDuration();
+      audioPlayerDuration = duration?.inMilliseconds ?? 0;
+      await audioPlayer!.seek(playPos ?? const Duration(seconds: 2));
+
+      return audioPlayer;
+    } catch (err) {
+      print("Failed to load audio file: $err");
       audioPlayer = null;
+      return null;
     }
-
-    return audioPlayer;
   }
 
-  MuonVoice toSerializable([MuonProject project]) {
+  MuonVoice toSerializable([MuonProject? project]) {
     final out = MuonVoice();
     out.project = project ?? this.project.toSerializable();
     out.modelName = modelName;
@@ -240,7 +244,7 @@ class MuonVoiceController with WeakEqualityController {
   }
 
   static MuonVoiceController fromSerializable(MuonVoice obj,
-      [MuonProjectController project]) {
+      [MuonProjectController? project]) {
     final out = MuonVoiceController().ctx();
     out.project =
         project ?? MuonProjectController.fromSerializable(obj.project);

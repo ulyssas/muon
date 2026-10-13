@@ -31,7 +31,7 @@ class AddVoiceAction extends MuonAction {
       voice.project.currentVoiceID = max(0, voice.project.currentVoiceID);
     }
     if (voice.audioPlayer != null) {
-      voice.audioPlayer.dispose();
+      voice.audioPlayer!.dispose();
       voice.audioPlayer = null;
     }
     voice.project.voices.remove(voice);

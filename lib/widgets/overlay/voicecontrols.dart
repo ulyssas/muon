@@ -99,7 +99,7 @@ class MuonVoiceControls extends StatelessWidget {
             tooltip: "Delete voice",
             onPressed: () {
               if (voice.audioPlayer != null) {
-                voice.audioPlayer.dispose();
+                voice.audioPlayer!.dispose();
                 voice.audioPlayer = null;
               }
               final currentID = voice.project.voices.indexOf(voice);

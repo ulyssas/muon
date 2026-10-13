@@ -1,6 +1,6 @@
 import "dart:io";
 
-import "package:file_selector_platform_interface/file_selector_platform_interface.dart";
+import "package:file_selector/file_selector.dart";
 import "package:flutter/material.dart";
 import "package:muon/editor.dart";
 import "package:muon/main.dart";
@@ -26,28 +26,24 @@ class MuonFirstTimeSetupDialog extends StatelessWidget {
               ),
               ElevatedButton(
                 child: Text("Choose NEUTRINO SDK Folder Location"),
-                onPressed: () {
-                  FileSelectorPlatform.instance
-                      .getDirectoryPath(
-                    confirmButtonText: "Open NEUTRINO SDK",
-                  )
-                      .catchError((err) {
-                    print("internal file browser error: $err");
-                  }) // oh wow i am so naughty
-                      .then((value) {
-                    if (value != null) {
-                      if (Directory(value).existsSync()) {
-                        if (File("$value/bin/NEUTRINO.exe").existsSync() ||
-                            File("$value/bin/NEUTRINO").existsSync()) {
-                          settings.neutrinoDir = value;
-                          settings.save();
-                          return;
-                        }
+                onPressed: () async {
+                  try {
+                    final String? selectedDir = await getDirectoryPath(
+                      confirmButtonText: "Open NEUTRINO SDK",
+                    );
+
+                    if (selectedDir != null) {
+                      final isNeutrino = File("$selectedDir/bin/NEUTRINO.exe").existsSync() || File("$selectedDir/bin/NEUTRINO").existsSync();
+                      if (Directory(selectedDir).existsSync() && isNeutrino) {
+                        settings.neutrinoDir = selectedDir;
+                        settings.save();
+                        return;
                       }
 
                       settings.neutrinoDir = "";
                       settings.save();
 
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         backgroundColor: Theme.of(context).colorScheme.error,
@@ -56,7 +52,9 @@ class MuonFirstTimeSetupDialog extends StatelessWidget {
                         duration: Duration(seconds: 5),
                       ));
                     }
-                  });
+                  } catch (err) {
+                    print("internal file browser error: $err");
+                  }
                 },
               ),
               SizedBox(

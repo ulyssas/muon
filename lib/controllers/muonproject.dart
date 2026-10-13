@@ -219,7 +219,7 @@ class MuonProjectController with WeakEqualityController {
 
     for (final voice in voices) {
       if (voice.audioPlayer != null) {
-        voice.audioPlayer.dispose();
+        voice.audioPlayer!.dispose();
         voice.audioPlayer = null;
       }
     }
@@ -250,27 +250,28 @@ class MuonProjectController with WeakEqualityController {
     playbackTimer = Timer.periodic(Duration(milliseconds: 1), (Timer t) async {
       if (voices.length > currentVoiceID) {
         if (internalStatus == "playing") {
-          MuonVoiceController longestVoice;
+          MuonVoiceController? longestVoice;
 
           for (final voice in voices) {
             if (voice.audioPlayer != null) {
-              if (voice.audioPlayerDuration >
-                  longestVoice.audioPlayerDuration) {
+              if (longestVoice == null || voice.audioPlayerDuration > longestVoice.audioPlayerDuration) {
                 longestVoice = voice;
               }
             }
           }
 
-          dynamic posDur = await longestVoice.audioPlayer.getPosition();
-          if (posDur is Duration) {
-            int curPos = posDur.inMilliseconds;
+          if (longestVoice != null) {
+            final Duration? posDur = await longestVoice.audioPlayer?.getCurrentPosition();
+            if (posDur != null) {
+              int curPos = posDur.inMilliseconds;
 
-            if (curPos >= longestVoice.audioPlayerDuration) {
-              playheadTime = 0;
-              internalStatus = "idle";
-            } else {
-              int voicePos = curPos - getLabelMillisecondOffset();
-              playheadTime = voicePos / 1000 * (bpm / 60);
+              if (curPos >= longestVoice.audioPlayerDuration) {
+                playheadTime = 0;
+                internalStatus = "idle";
+              } else {
+                int voicePos = curPos - getLabelMillisecondOffset();
+                playheadTime = voicePos / 1000 * (bpm / 60);
+              }
             }
           }
         }
@@ -389,9 +390,10 @@ class MuonProjectController with WeakEqualityController {
         var voice = MuonVoiceController().ctx()..project = this;
 
         int timeUnitMulFactor = 1;
-        if (timeUnitsPerBeat != midi.header.ticksPerBeat) {
+        final ticksPerBeat = midi.header.ticksPerBeat;
+        if (ticksPerBeat != null && timeUnitsPerBeat != ticksPerBeat) {
           timeUnitMulFactor = timeUnitsPerBeat;
-          setTimeUnitsPerBeat(timeUnitsPerBeat * midi.header.ticksPerBeat);
+          setTimeUnitsPerBeat(timeUnitsPerBeat * ticksPerBeat);
         }
 
         final midiNotes = [
@@ -411,7 +413,7 @@ class MuonProjectController with WeakEqualityController {
 
         var curTime = 0;
         var lastNoteOnTime = 0;
-        NoteOnEvent lastNoteOn;
+        NoteOnEvent? lastNoteOn;
         for (final midiEvent in midi.tracks[0]) {
           curTime += midiEvent.deltaTime;
 
@@ -419,7 +421,7 @@ class MuonProjectController with WeakEqualityController {
             case "setTempo":
               {
                 if (importTimeMetadata) {
-                  SetTempoEvent tempoEvent = midiEvent;
+                  SetTempoEvent tempoEvent = midiEvent as SetTempoEvent;
 
                   bpm = 60 / (tempoEvent.microsecondsPerBeat / 1000);
                   markAllVoicesAsChanged();
@@ -429,7 +431,7 @@ class MuonProjectController with WeakEqualityController {
             case "timeSignature":
               {
                 if (importTimeMetadata) {
-                  TimeSignatureEvent timeSigEvent = midiEvent;
+                  TimeSignatureEvent timeSigEvent = midiEvent as TimeSignatureEvent;
 
                   beatsPerMeasure = timeSigEvent.numerator;
                   beatValue = timeSigEvent.denominator;
@@ -452,7 +454,7 @@ class MuonProjectController with WeakEqualityController {
                   lastNoteOn = null;
                 }
 
-                NoteOnEvent noteOnEvent = midiEvent;
+                NoteOnEvent noteOnEvent = midiEvent as NoteOnEvent;
                 lastNoteOn = noteOnEvent;
                 lastNoteOnTime = curTime;
 

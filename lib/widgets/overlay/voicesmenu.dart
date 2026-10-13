@@ -1,4 +1,4 @@
-import "package:file_selector_platform_interface/file_selector_platform_interface.dart";
+import "package:file_selector/file_selector.dart";
 import "package:flutter/material.dart";
 import "package:muon/controllers/muonvoice.dart";
 import "package:muon/editor.dart";
@@ -76,22 +76,19 @@ class MuonVoicesMenu extends StatelessWidget {
                     child: IconButton(
                       icon: const Icon(Icons.code),
                       tooltip: "Import voice from MusicXML",
-                      onPressed: () {
-                        FileSelectorPlatform.instance
-                            .openFile(
-                          confirmButtonText: "Open MusicXML File",
-                        )
-                            .catchError((err) {
-                          print("internal file browser error: $err");
-                        }) // oh wow i am so naughty
-                            .then((value) {
-                          if (value != null) {
-                            MusicXML musicXML =
-                                MusicXMLUtils.parseFile(value.path);
-                            currentProject.importVoiceFromMusicXML(
-                                musicXML, true);
+                      onPressed: () async {
+                        try {
+                          final XFile? file = await openFile(
+                            confirmButtonText: "Open MusicXML File",
+                          );
+
+                          if (file != null) {
+                            MusicXML musicXML = MusicXMLUtils.parseFile(file.path);
+                            currentProject.importVoiceFromMusicXML(musicXML, true);
                           }
-                        });
+                        } catch (err) {
+                          print("internal file browser error: $err");
+                        }
                       },
                     ),
                   ),
@@ -103,20 +100,18 @@ class MuonVoicesMenu extends StatelessWidget {
                     child: IconButton(
                       icon: const Icon(Icons.queue_music),
                       tooltip: "Import voice from MIDI",
-                      onPressed: () {
-                        FileSelectorPlatform.instance
-                            .openFile(
-                          confirmButtonText: "Open MIDI File",
-                        )
-                            .catchError((err) {
-                          print("internal file browser error: $err");
-                        }) // oh wow i am so naughty
-                            .then((value) {
-                          if (value != null) {
-                            currentProject.importVoiceFromMIDIFile(
-                                value.path, true);
+                      onPressed: () async {
+                        try {
+                          final XFile? file = await openFile(
+                            confirmButtonText: "Open MIDI File",
+                          );
+
+                          if (file != null) {
+                            currentProject.importVoiceFromMIDIFile(file.path, true);
                           }
-                        });
+                        } catch (err) {
+                          print("internal file browser error: $err");
+                        }
                       },
                     ),
                   ),

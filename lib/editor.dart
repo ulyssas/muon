@@ -1,6 +1,6 @@
 import "dart:async";
 
-import "package:file_selector_platform_interface/file_selector_platform_interface.dart";
+import "package:file_selector/file_selector.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:muon/controllers/muonproject.dart";
@@ -44,60 +44,63 @@ class MuonEditor extends StatefulWidget {
 
   /// Opens a file selector dialog and prompts the user to open
   /// a project.json file
-  static Future openProject(BuildContext context) {
-    return FileSelectorPlatform.instance.openFile(
-      confirmButtonText: "Open Project",
-      acceptedTypeGroups: [
-        XTypeGroup(
-          label: "Muon Project Files",
-          extensions: ["json"],
-        )
-      ],
-    ).then((value) {
-      if (value != null) {
-        final proj = MuonProjectController.loadFromFile(value.path);
-        currentProject.updateWith(proj);
+  static Future<bool> openProject(BuildContext context) async {
+    try {
+      const XTypeGroup typeGroup = XTypeGroup(
+        label: "Muon Project Files",
+        extensions: ["json"],
+      );
+      final XFile? file = await openFile(
+        confirmButtonText: "Open Project",
+        acceptedTypeGroups: [typeGroup],
+      );
 
+      if (file != null) {
+        final proj = MuonProjectController.loadFromFile(file.path);
+        currentProject.updateWith(proj);
         return true;
       }
-    }).catchError((err) {
+      return false;
+    } catch (err) {
+      if (!context.mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Theme.of(context).colorScheme.error,
         content: Text("internal error: $err"),
-        duration: Duration(seconds: 10),
+        duration: const Duration(seconds: 10),
       ));
-    }); // oh wow i am so naughty
+      return false;
+    }
   }
 
   /// Opens a file selector dialog and prompts the user to create
   /// a project.json file
-  static Future createNewProject() {
-    return FileSelectorPlatform.instance
-        .getSavePath(
-      confirmButtonText: "Create Project",
-      acceptedTypeGroups: [
-        XTypeGroup(
-          label: "Muon Project Files",
-          extensions: ["json"],
-        )
-      ],
-      suggestedName: "project.json",
-    )
-        .then((value) {
-      if (value != null) {
+  static Future<bool> createNewProject() async {
+    try {
+      const XTypeGroup typeGroup = XTypeGroup(
+        label: "Muon Project Files",
+        extensions: ["json"],
+      );
+      final FileSaveLocation? location = await getSaveLocation(
+        confirmButtonText: "Create Project",
+        acceptedTypeGroups: [typeGroup],
+        suggestedName: "project.json",
+      );
+
+      if (location != null) {
         currentProject.updateWith(MuonProjectController.defaultProject());
-        currentProject.projectDir = p.dirname(value);
-        currentProject.projectFileName = p.basename(value);
+        currentProject.projectDir = p.dirname(location.path);
+        currentProject.projectFileName = p.basename(location.path);
         if (!currentProject.projectFileName.endsWith(".json")) {
           currentProject.projectFileName += ".json";
         }
         currentProject.save();
-
         return true;
       }
-    }).catchError((err) {
+      return false;
+    } catch (err) {
       print("internal error: $err");
-    }); // oh wow i am so naughty
+      return false;
+    }
   }
 
   /// Compiles all voices, and then plays audio from the playhead's
@@ -150,7 +153,7 @@ class MuonEditor extends StatefulWidget {
 
   static Future<void> _compileVoiceInternal(MuonVoiceController voice) async {
     if (voice.audioPlayer != null) {
-      await voice.audioPlayer.unload();
+      await voice.audioPlayer!.stop();
     }
 
     if (voice.hasChangedNoteData) {
@@ -186,18 +189,19 @@ class MuonEditor extends StatefulWidget {
   static Future<bool> _playVoiceInternal(
       MuonVoiceController voice, Duration playPos, double volume) async {
     if (voice.audioPlayer != null) {
-      await voice.audioPlayer.unload();
+      await voice.audioPlayer!.stop();
     }
 
     final audioPlayer = await voice.getAudioPlayer(playPos);
+    if (audioPlayer == null) return false;
 
-    audioPlayer.setVolume(volume);
-    await audioPlayer.setPosition(playPos);
-    final suc = await audioPlayer.play();
-
-    if (suc) {
+    try {
+      await audioPlayer.setVolume(volume);
+      await audioPlayer.seek(playPos);
+      await audioPlayer.resume();
       return true;
-    } else {
+    } catch (err) {
+      print("Audio playback error: $err");
       return false;
     }
   }
@@ -207,7 +211,7 @@ class MuonEditor extends StatefulWidget {
   static Future<void> stopAudio() async {
     for (final voice in currentProject.voices) {
       if (voice.audioPlayer != null) {
-        voice.audioPlayer.unload();
+        voice.audioPlayer!.stop();
       }
     }
     if (currentProject.internalStatus == "playing") {
