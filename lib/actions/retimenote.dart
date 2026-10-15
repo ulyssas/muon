@@ -1,29 +1,29 @@
-import 'dart:math';
+import "dart:math";
 
-import 'package:muon/actions/base.dart';
-import 'package:muon/controllers/muonnote.dart';
+import "package:muon/actions/base.dart";
+import "package:muon/controllers/muonnote.dart";
 
 class RetimeNoteAction extends MuonAction {
+  @override
   String get title {
-    if(durationDeltaMax > 0) {
-      if(notes.isNotEmpty) {
+    if (durationDeltaMax > 0) {
+      if (notes.isNotEmpty) {
         return "Lengthen ${notes.length} notes";
-      }
-      else {
+      } else {
         return "Lengthen note";
       }
-    }
-    else {
-      if(notes.isNotEmpty) {
+    } else {
+      if (notes.isNotEmpty) {
         return "Shorten ${notes.length} notes";
-      }
-      else {
+      } else {
         return "Shorten note";
       }
     }
   }
+
+  @override
   String get subtitle {
-    if(durationDeltaMax != 0) {
+    if (durationDeltaMax != 0) {
       return "by ${fixTimeDelta(durationDeltaMax).abs()} time units";
     }
 
@@ -35,32 +35,37 @@ class RetimeNoteAction extends MuonAction {
 
   int get durationDeltaMax => durationDelta.reduce(max);
 
-  int cachedProjectTimeUnitsPerBeat;
+  late int cachedProjectTimeUnitsPerBeat;
 
-  int fixTimeDelta(int timeDelta) => ((timeDelta * notes.first.voice.project.timeUnitsPerBeat) ~/ cachedProjectTimeUnitsPerBeat);
+  int fixTimeDelta(int timeDelta) =>
+      ((timeDelta * notes.first.voice.project.timeUnitsPerBeat) ~/
+      cachedProjectTimeUnitsPerBeat);
 
-  RetimeNoteAction(this.notes,this.durationDelta) {
-    assert(this.notes.isNotEmpty);
-    assert(this.notes.length == this.durationDelta.length);
+  RetimeNoteAction(this.notes, this.durationDelta) {
+    assert(notes.isNotEmpty);
+    assert(notes.length == durationDelta.length);
     cachedProjectTimeUnitsPerBeat = notes.first.voice.project.timeUnitsPerBeat;
   }
 
+  @override
   void perform() {
-    for(int i=0;i < notes.length;i++) {
+    for (int i = 0; i < notes.length; i++) {
       final note = notes[i];
       note.duration += fixTimeDelta(durationDelta[i]);
     }
   }
 
+  @override
   void undo() {
-    for(int i=0;i < notes.length;i++) {
+    for (int i = 0; i < notes.length; i++) {
       final note = notes[i];
-      note.duration = max(0,note.duration - fixTimeDelta(durationDelta[i]));
+      note.duration = max(0, note.duration - fixTimeDelta(durationDelta[i]));
     }
   }
-  
+
+  @override
   void markVoiceModified() {
-    for(final note in notes) {
+    for (final note in notes) {
       note.voice.hasChangedNoteData = true;
     }
   }

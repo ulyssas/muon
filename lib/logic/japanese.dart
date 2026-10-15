@@ -2,12 +2,12 @@ import "package:kana_kit/kana_kit.dart";
 
 const kanaKit = KanaKit();
 
-/// 
+///
 /// A helper library for dealing with parsing Hiragana/Katakana, with the
 /// aim of interacting with Sinsy's MusicXMLToLabel file
-/// 
+///
 /// All of the glyphs in this file were derived from Sinsy's dictionary
-/// 
+///
 class JapaneseUTF8 {
   static const BIG_CHARS = [
     "ク",
@@ -198,18 +198,22 @@ class JapaneseUTF8 {
     "ゃ",
     "ョ",
     "ュ",
-    "ャ"
+    "ャ",
   ];
 
   static final _smallBois = SMALL_CHARS.join("");
   static final _bigBois = BIG_CHARS.join("");
-  static final _charRegex = RegExp("[" + _bigBois + "][" + _smallBois + "]?");
+  static final _charRegex = RegExp("[$_bigBois][$_smallBois]?");
 
   /// Converts input in any form (romaji/hiragana/katakana) into an array of hiragana
   /// syllables (i.e. ra, ri, re, ryo, nye, sho, etc.)
   static List<String> alphabetToHiragana(String input) {
-    String hiragana = kanaKit.toHiragana(input);
+    final String hiragana = kanaKit.toHiragana(input);
 
-    return _charRegex.allMatches(hiragana).toList().map((RegExpMatch val) => val.group(0)).toList();
+    return _charRegex
+        .allMatches(hiragana)
+        .map((match) => match.group(0))
+        .whereType<String>()
+        .toList();
   }
 }

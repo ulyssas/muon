@@ -1,19 +1,12 @@
+import "dart:async";
 
-import 'dart:async';
-
-import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
-import 'package:flutter/material.dart';
-import 'package:muon/widgets/overlay/actioncontrols.dart';
-import "package:synaps_flutter/synaps_flutter.dart";
-import 'package:muon/controllers/muonvoice.dart';
-import 'package:muon/editor.dart';
-import 'package:muon/logic/musicxml.dart';
-import 'package:muon/widgets/overlay/voicecontrols.dart';
+import "package:flutter/material.dart";
+import "package:muon/editor.dart";
+import "package:muon/synaps_compat.dart";
+import "package:muon/widgets/overlay/actioncontrols.dart";
 
 class MuonActionsMenu extends StatelessWidget {
-  MuonActionsMenu({
-    Key key,
-  }) : super(key: key);
+  MuonActionsMenu({super.key});
 
   final _controller = ScrollController();
 
@@ -22,6 +15,16 @@ class MuonActionsMenu extends StatelessWidget {
     int lastLength = 0;
     final themeData = Theme.of(context);
     return Container(
+      decoration: BoxDecoration(
+        color: themeData.scaffoldBackgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 1,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
       child: Column(
         verticalDirection: VerticalDirection.up,
         children: [
@@ -44,12 +47,14 @@ class MuonActionsMenu extends StatelessWidget {
                   },
                 );
 
-                if(currentProject.actions.length != lastLength) {
+                if (currentProject.actions.length != lastLength) {
                   scheduleMicrotask(() {
-                    if(currentProject.actions.length > 0) {
+                    if (currentProject.actions.isNotEmpty) {
                       _controller.animateTo(
-                        _controller.position.maxScrollExtent / currentProject.actions.length * currentProject.nextActionPos,
-                        duration: Duration(milliseconds: 200),
+                        _controller.position.maxScrollExtent /
+                            currentProject.actions.length *
+                            currentProject.nextActionPos,
+                        duration: const Duration(milliseconds: 200),
                         curve: Curves.fastOutSlowIn,
                       );
                     }
@@ -63,23 +68,36 @@ class MuonActionsMenu extends StatelessWidget {
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(vertical: 5),
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            decoration: BoxDecoration(
+              color: themeData.scaffoldBackgroundColor,
+              boxShadow: [
+                BoxShadow(
+                  offset: const Offset(0, 5),
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 3,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
             child: Stack(
               children: [
-                Align(
+                const Align(
                   alignment: Alignment.center,
-                  child: Text("Actions",style: TextStyle(fontSize: 26),)
+                  child: Text("Actions", style: TextStyle(fontSize: 26)),
                 ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: Transform.translate(
-                    offset: Offset(-5,0),
+                    offset: const Offset(-5, 0),
                     child: IconButton(
                       icon: const Icon(Icons.restore),
                       tooltip: "Redo all",
                       onPressed: () {
-                        if(currentProject.actions.isNotEmpty) {
-                          currentProject.redoUntilAction(currentProject.actions.last);
+                        if (currentProject.actions.isNotEmpty) {
+                          currentProject.redoUntilAction(
+                            currentProject.actions.last,
+                          );
                         }
                       },
                     ),
@@ -87,29 +105,8 @@ class MuonActionsMenu extends StatelessWidget {
                 ),
               ],
             ),
-            decoration: BoxDecoration(
-              color: themeData.scaffoldBackgroundColor,
-              boxShadow: [
-                BoxShadow(
-                  offset: Offset(0,5),
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 3,
-                  spreadRadius: 1,
-                ),
-              ]
-            ),
           ),
         ],
-      ),
-      decoration: BoxDecoration(
-        color: themeData.scaffoldBackgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.5),
-            blurRadius: 1,
-            spreadRadius: 1,
-          ),
-        ]
       ),
     );
   }

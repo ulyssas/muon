@@ -1,12 +1,10 @@
-import "package:synaps_flutter/synaps_flutter.dart";
 import "package:muon/controllers/muonvoice.dart";
 import "package:muon/serializable/muon.dart";
-
-part "muonnote.g.dart";
+import "package:muon/synaps_compat.dart";
 
 @Controller()
 class MuonNoteController with WeakEqualityController {
-  MuonVoiceController voice;
+  late MuonVoiceController voice;
 
   /// The alphabetical value of this note
   /// `/[A-G]#?/`
@@ -31,36 +29,62 @@ class MuonNoteController with WeakEqualityController {
   int duration = 0;
 
   /// Adds `deltaSemitones` to this note
-  /// 
+  ///
   /// e.g. if this was a `C4`, adding `2` semitones gives you `D4`,
   /// and adding `-2` semitones gives you `A#3`
   void addSemitones(int deltaSemitones) {
-    final midiNotes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+    final midiNotes = [
+      "C",
+      "C#",
+      "D",
+      "D#",
+      "E",
+      "F",
+      "F#",
+      "G",
+      "G#",
+      "A",
+      "A#",
+      "B",
+    ];
 
-    final currentNoteID = midiNotes.indexOf(this.note);
+    final currentNoteID = midiNotes.indexOf(note);
     final deltaOctave = ((deltaSemitones + currentNoteID) / 12).floor();
     final fixedDeltaSemitones = deltaSemitones - deltaOctave * 12;
-    
+
     note = midiNotes[currentNoteID + fixedDeltaSemitones];
     octave = octave + deltaOctave;
   }
 
   /// Returns the number of semitones this note is above C0.
   int toAbsoluteSemitones() {
-    const midiNotes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+    const midiNotes = [
+      "C",
+      "C#",
+      "D",
+      "D#",
+      "E",
+      "F",
+      "F#",
+      "G",
+      "G#",
+      "A",
+      "A#",
+      "B",
+    ];
 
     final currentNoteID = midiNotes.indexOf(note);
-    
+
     return octave * 12 + currentNoteID;
   }
 
   MuonNote toSerializable() {
     final out = MuonNote();
-    out.note = this.note;
-    out.octave = this.octave;
-    out.lyric = this.lyric;
-    out.startAtTime = this.startAtTime;
-    out.duration = this.duration;
+    out.note = note;
+    out.octave = octave;
+    out.lyric = lyric;
+    out.startAtTime = startAtTime;
+    out.duration = duration;
     return out;
   }
 

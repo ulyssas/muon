@@ -1,43 +1,44 @@
+import "dart:io";
 
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:muon/editor.dart';
+import "package:flutter/material.dart";
+import "package:muon/editor.dart";
 
 class MuonWelcomeDialog extends StatelessWidget {
+  const MuonWelcomeDialog({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: AlertDialog(
-        title: Center(child: Text("Welcome to Muon!")),
+        title: const Center(child: Text("Welcome to Muon!")),
         content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
-              RaisedButton(
-                child: Text("Create New Project"),
+              ElevatedButton(
+                child: const Text("Create New Project"),
                 onPressed: () async {
                   final suc = await MuonEditor.createNewProject();
-                  if(suc == true) {
+                  if (suc == true) {
                     Navigator.of(context, rootNavigator: true).pop();
                   }
-                }
+                },
               ),
-              SizedBox(height: 10),
-              RaisedButton(
-                child: Text("Open Project"),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                child: const Text("Open Project"),
                 onPressed: () async {
                   final suc = await MuonEditor.openProject(context);
-                  if(suc == true) {
+                  if (suc == true) {
                     Navigator.of(context, rootNavigator: true).pop();
                   }
-                }
-              )
+                },
+              ),
             ],
           ),
         ),
         actions: <Widget>[
           TextButton(
-            child: Text("About"),
+            child: const Text("About"),
             onPressed: () {
               showAboutDialog(
                 context: context,
@@ -47,8 +48,8 @@ class MuonWelcomeDialog extends StatelessWidget {
               );
             },
           ),
-          OutlineButton(
-            child: Text("Quit"),
+          OutlinedButton(
+            child: const Text("Quit"),
             onPressed: () {
               exit(0);
             },

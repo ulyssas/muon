@@ -1,7 +1,5 @@
-import 'package:muon/serializable/settings.dart';
-import "package:synaps_flutter/synaps_flutter.dart";
-
-part "settings.g.dart";
+import "package:muon/serializable/settings.dart";
+import "package:muon/synaps_compat.dart";
 
 @Controller()
 class MuonSettingsController {
@@ -19,5 +17,6 @@ class MuonSettingsController {
     _darkModeInternal = value;
 
     settings.save();
+    SynapsHub.notify();
   }
 }
