@@ -1,0 +1,109 @@
+name: Build Muon
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: Windows x64
+            os: windows-latest
+            target: windows
+            arch_name: windows-x64
+            build_dir: build/windows/x64/runner/Release
+          - label: Linux x64
+            os: ubuntu-latest
+            target: linux
+            arch_name: linux-x64
+            build_dir: build/linux/x64/release/bundle
+          - label: macOS ARM
+            os: macos-latest
+            target: macos
+            arch_name: macos-arm64
+            build_dir: build/macos/Build/Products/Release/muon.app
+
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout Main
+        uses: actions/checkout@v5
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.47.7"
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libstdc++-12-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Run code generation
+        run: dart run build_runner build
+
+      - name: Build Flutter App
+        run: flutter build ${{ matrix.target }} --release
+
+      - name: Archive artifacts (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Compress-Archive -Path "${{ matrix.build_dir }}\*" -DestinationPath "$env:GITHUB_WORKSPACE\Muon-${{ github.ref_name }}-${{ matrix.arch_name }}.zip"
+
+      - name: Archive artifacts (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          cd "${{ matrix.build_dir }}"
+          zip -qr "$GITHUB_WORKSPACE/Muon-${{ github.ref_name }}-${{ matrix.arch_name }}.zip" .
+
+      - name: Archive artifacts (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent "${{ matrix.build_dir }}" "$GITHUB_WORKSPACE/Muon-${{ github.ref_name }}-${{ matrix.arch_name }}.zip"
+
+      - name: Upload zip artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: Muon-${{ github.ref_name }}-${{ matrix.arch_name }}
+          path: Muon-${{ github.ref_name }}-${{ matrix.arch_name }}.zip
+          if-no-files-found: error
+
+  release:
+    name: Create Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: release-artifacts
+          merge-multiple: true
+
+      - name: Create a Release
+        id: create_release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: Release ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          files: release-artifacts/*.zip
+          draft: true
+          generate_release_notes: true
+          prerelease: false
