@@ -11,28 +11,25 @@ class MuonSidebar extends StatelessWidget {
     final themeData = Theme.of(context);
     return Container(
       width: 400,
-      decoration:
-          BoxDecoration(color: themeData.scaffoldBackgroundColor, boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.5),
-          blurRadius: 7,
-          spreadRadius: 1,
-        ),
-      ]),
+      decoration: BoxDecoration(
+        color: themeData.scaffoldBackgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 7,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          MuonProjectMetadataMenu(),
+          const MuonProjectMetadataMenu(),
           const SizedBox(height: 10),
-          Expanded(
-            child: MuonVoicesMenu(),
-          ),
-          SizedBox(
-            height: 150,
-            child: MuonActionsMenu(),
-          ),
+          const Expanded(child: MuonVoicesMenu()),
+          SizedBox(height: 150, child: MuonActionsMenu()),
         ],
       ),
     );

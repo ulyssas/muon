@@ -76,10 +76,10 @@ class MuonProject {
       final file = File(projectFile);
 
       if (file.existsSync()) {
-        var fileContents = file.readAsStringSync();
+        final fileContents = file.readAsStringSync();
 
         final jsonData = jsonDecode(fileContents);
-        MuonProject project = MuonProject.fromJson(jsonData);
+        final MuonProject project = MuonProject.fromJson(jsonData);
 
         for (final voice in project.voices) {
           voice.project = project;
@@ -109,7 +109,7 @@ class MuonProject {
     }
 
     final jsonContents = toJson();
-    String fileContents = jsonEncode(jsonContents);
+    final String fileContents = jsonEncode(jsonContents);
 
     final file = File("$projectDir/$projectFileName");
     file.writeAsStringSync(fileContents);

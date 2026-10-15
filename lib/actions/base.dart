@@ -1,5 +1,3 @@
-import "package:muon/synaps_compat.dart";
-
 abstract class MuonAction {
   /// Human readable title of the action
   String get title;

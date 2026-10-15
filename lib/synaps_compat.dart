@@ -1,9 +1,19 @@
 import "package:flutter/widgets.dart";
 
-class Controller { const Controller(); }
-class Observable { const Observable(); }
+class Controller {
+  const Controller();
+}
+
+class Observable {
+  const Observable();
+}
+
 mixin WeakEqualityController {}
-extension SynapsContextExtension<T> on T { T ctx() => this; }
+
+extension SynapsContextExtension<T> on T {
+  T ctx() => this;
+}
+
 typedef SynapsMap<K, V> = Map<K, V>;
 
 class SynapsHub extends ChangeNotifier {

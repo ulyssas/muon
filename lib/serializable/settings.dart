@@ -16,16 +16,17 @@ class MuonSettings {
       _$MuonSettingsFromJson(json);
   Map<String, dynamic> toJson() => _$MuonSettingsToJson(this);
 
-  static MuonSettings? loadFromFile(
-      [String settingsFile = "muon_settings.json"]) {
+  static MuonSettings? loadFromFile([
+    String settingsFile = "muon_settings.json",
+  ]) {
     if (File(settingsFile).existsSync()) {
       final file = File(settingsFile);
 
       if (file.existsSync()) {
-        var fileContents = file.readAsStringSync();
+        final fileContents = file.readAsStringSync();
 
         final jsonData = jsonDecode(fileContents);
-        MuonSettings settings = MuonSettings.fromJson(jsonData);
+        final MuonSettings settings = MuonSettings.fromJson(jsonData);
 
         return settings;
       }
@@ -36,7 +37,7 @@ class MuonSettings {
 
   void save([String settingsFile = "muon_settings.json"]) {
     final jsonContents = toJson();
-    String fileContents = jsonEncode(jsonContents);
+    final String fileContents = jsonEncode(jsonContents);
 
     final file = File(settingsFile);
     file.writeAsStringSync(fileContents);
@@ -44,7 +45,7 @@ class MuonSettings {
 }
 
 MuonSettings getMuonSettings() {
-  var settings = MuonSettings.loadFromFile();
+  final settings = MuonSettings.loadFromFile();
 
   return settings ?? MuonSettings();
 }

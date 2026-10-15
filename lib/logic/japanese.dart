@@ -198,7 +198,7 @@ class JapaneseUTF8 {
     "ゃ",
     "ョ",
     "ュ",
-    "ャ"
+    "ャ",
   ];
 
   static final _smallBois = SMALL_CHARS.join("");
@@ -208,7 +208,7 @@ class JapaneseUTF8 {
   /// Converts input in any form (romaji/hiragana/katakana) into an array of hiragana
   /// syllables (i.e. ra, ri, re, ryo, nye, sho, etc.)
   static List<String> alphabetToHiragana(String input) {
-    String hiragana = kanaKit.toHiragana(input);
+    final String hiragana = kanaKit.toHiragana(input);
 
     return _charRegex
         .allMatches(hiragana)

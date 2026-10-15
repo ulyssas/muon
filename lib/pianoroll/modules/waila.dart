@@ -42,15 +42,18 @@ class PianoRollWAILAModule extends PianoRollModule {
     // clear all transforms
     canvas.restore();
 
-    final mouseBeatNum = max(0, painter.getBeatNumAtCursor(curMousePos!.x.toDouble()));
+    final mouseBeatNum = max(
+      0,
+      painter.getBeatNumAtCursor(curMousePos!.x.toDouble()),
+    );
     final mouseBeatSubDivNum =
         (((mouseBeatNum * project.timeUnitsPerBeat).floor() %
-                    project.timeUnitsPerBeat) ~/
-                project.timeUnitsPerSubdivision) +
-            1;
+                project.timeUnitsPerBeat) ~/
+            project.timeUnitsPerSubdivision) +
+        1;
     final mouseMeasureNum = (mouseBeatNum / project.beatsPerMeasure).ceil();
     final mousePitch = painter.getPitchAtCursor(curMousePos.y.toDouble());
-    var wailaLabelPainter = TextPainter(
+    final wailaLabelPainter = TextPainter(
       text: TextSpan(
         style: TextStyle(
           color: themeData.brightness == Brightness.light
@@ -65,20 +68,24 @@ class PianoRollWAILAModule extends PianoRollModule {
       textDirection: TextDirection.ltr,
     )..layout();
 
-    var wailaRect = Rect.fromLTWH(
+    final wailaRect = Rect.fromLTWH(
       size.width - 10 - wailaLabelPainter.width,
       size.height - 10 - wailaLabelPainter.height,
       10 + wailaLabelPainter.width,
       10 + wailaLabelPainter.height,
     );
-    var wailaShadowPath = Path();
+    final wailaShadowPath = Path();
     wailaShadowPath.addRect(wailaRect);
 
     canvas.drawShadow(wailaShadowPath, Colors.black, 10, false);
     canvas.drawRect(
-        wailaRect, Paint()..color = themeData.scaffoldBackgroundColor);
+      wailaRect,
+      Paint()..color = themeData.scaffoldBackgroundColor,
+    );
     wailaLabelPainter.paint(
-        canvas, Offset(wailaRect.left + 5, wailaRect.top + 5));
+      canvas,
+      Offset(wailaRect.left + 5, wailaRect.top + 5),
+    );
 
     // back up transforms
     canvas.save();

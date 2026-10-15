@@ -45,7 +45,7 @@ class MuonNoteController with WeakEqualityController {
       "G#",
       "A",
       "A#",
-      "B"
+      "B",
     ];
 
     final currentNoteID = midiNotes.indexOf(note);
@@ -70,7 +70,7 @@ class MuonNoteController with WeakEqualityController {
       "G#",
       "A",
       "A#",
-      "B"
+      "B",
     ];
 
     final currentNoteID = midiNotes.indexOf(note);

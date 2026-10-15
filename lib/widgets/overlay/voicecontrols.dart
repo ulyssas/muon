@@ -9,10 +9,7 @@ import "package:muon/logic/helpers.dart";
 import "package:muon/synaps_compat.dart";
 
 class MuonVoiceControls extends StatelessWidget {
-  const MuonVoiceControls({
-    super.key,
-    required this.voice,
-  });
+  const MuonVoiceControls({super.key, required this.voice});
 
   final MuonVoiceController voice;
 
@@ -21,52 +18,60 @@ class MuonVoiceControls extends StatelessWidget {
     final themeData = Theme.of(context);
     return Container(
       height: 40,
-      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-      padding: EdgeInsets.only(left: 15),
-      decoration: BoxDecoration(color: themeData.cardColor, boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.5),
-          blurRadius: 1,
-          spreadRadius: 1,
-        ),
-      ]),
+      margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+      padding: const EdgeInsets.only(left: 15),
+      decoration: BoxDecoration(
+        color: themeData.cardColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 1,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
       child: Row(
         children: [
           Container(
-            margin: EdgeInsets.only(right: 10),
+            margin: const EdgeInsets.only(right: 10),
             width: 10,
             height: 10,
             decoration: BoxDecoration(
-                color: voice.color,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    blurRadius: 2,
-                    spreadRadius: 2,
-                  ),
-                ]),
+              color: voice.color,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.7),
+                  blurRadius: 2,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
           ),
           Align(
-              alignment: Alignment.centerLeft,
-              child: Rx(() => Text(
-                    "Voice ${currentProject.voices.indexOf(voice) + 1} (${voice.modelName})",
-                  ))),
-          Expanded(
-            child: Container(),
+            alignment: Alignment.centerLeft,
+            child: Rx(
+              () => Text(
+                "Voice ${currentProject.voices.indexOf(voice) + 1} (${voice.modelName})",
+              ),
+            ),
           ),
-          Rx(() => IconButton(
-                icon: const Icon(Icons.center_focus_strong),
-                disabledColor: Colors.green.withValues(alpha: 0.9),
-                tooltip: "Select voice",
-                onPressed: currentProject.currentVoiceID ==
-                        currentProject.voices.indexOf(voice)
-                    ? null
-                    : () {
-                        currentProject.currentVoiceID =
-                            currentProject.voices.indexOf(voice);
-                      },
-              )),
+          Expanded(child: Container()),
+          Rx(
+            () => IconButton(
+              icon: const Icon(Icons.center_focus_strong),
+              disabledColor: Colors.green.withValues(alpha: 0.9),
+              tooltip: "Select voice",
+              onPressed:
+                  currentProject.currentVoiceID ==
+                      currentProject.voices.indexOf(voice)
+                  ? null
+                  : () {
+                      currentProject.currentVoiceID = currentProject.voices
+                          .indexOf(voice);
+                    },
+            ),
+          ),
           PopupMenuButton(
             icon: const Icon(Icons.speaker_notes),
             tooltip: "Change voice model",
@@ -84,10 +89,7 @@ class MuonVoiceControls extends StatelessWidget {
 
               for (final modelName in models) {
                 items.add(
-                  PopupMenuItem(
-                    value: modelName,
-                    child: Text(modelName),
-                  ),
+                  PopupMenuItem(value: modelName, child: Text(modelName)),
                 );
               }
 
@@ -105,8 +107,10 @@ class MuonVoiceControls extends StatelessWidget {
               final currentID = voice.project.voices.indexOf(voice);
               if (voice.project.currentVoiceID >= currentID) {
                 voice.project.currentVoiceID--;
-                voice.project.currentVoiceID =
-                    max(0, voice.project.currentVoiceID);
+                voice.project.currentVoiceID = max(
+                  0,
+                  voice.project.currentVoiceID,
+                );
               }
               currentProject.voices.remove(voice);
               final action = RemoveVoiceAction(voice);

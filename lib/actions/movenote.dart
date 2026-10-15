@@ -46,7 +46,7 @@ class MoveNoteAction extends MuonAction {
 
   int fixTimeDelta(int timeDelta) =>
       ((timeDelta * notes.first.voice.project.timeUnitsPerBeat) ~/
-          cachedProjectTimeUnitsPerBeat);
+      cachedProjectTimeUnitsPerBeat);
 
   MoveNoteAction(this.notes, this.timeDelta, this.semitoneDelta) {
     assert(notes.isNotEmpty);

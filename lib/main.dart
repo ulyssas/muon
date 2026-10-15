@@ -22,7 +22,7 @@ void main() async {
 
   addLicenses();
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -30,19 +30,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Rx(() => MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: "Muon",
-          themeMode: appSettings.darkMode ? ThemeMode.dark : ThemeMode.light,
-          theme: ThemeData(
-            primarySwatch: Colors.purple,
-            brightness: Brightness.light,
-          ),
-          darkTheme: ThemeData(
-            primarySwatch: Colors.purple,
-            brightness: Brightness.dark,
-          ),
-          home: MuonEditor(),
-        ));
+    return Rx(
+      () => MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: "Muon",
+        themeMode: appSettings.darkMode ? ThemeMode.dark : ThemeMode.light,
+        theme: ThemeData(
+          primarySwatch: Colors.purple,
+          brightness: Brightness.light,
+        ),
+        darkTheme: ThemeData(
+          primarySwatch: Colors.purple,
+          brightness: Brightness.dark,
+        ),
+        home: const MuonEditor(),
+      ),
+    );
   }
 }

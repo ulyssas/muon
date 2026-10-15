@@ -39,7 +39,7 @@ class RetimeNoteAction extends MuonAction {
 
   int fixTimeDelta(int timeDelta) =>
       ((timeDelta * notes.first.voice.project.timeUnitsPerBeat) ~/
-          cachedProjectTimeUnitsPerBeat);
+      cachedProjectTimeUnitsPerBeat);
 
   RetimeNoteAction(this.notes, this.durationDelta) {
     assert(notes.isNotEmpty);

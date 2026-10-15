@@ -10,33 +10,35 @@ class MuonWelcomeDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AlertDialog(
-        title: Center(child: Text("Welcome to Muon!")),
+        title: const Center(child: Text("Welcome to Muon!")),
         content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
               ElevatedButton(
-                  child: Text("Create New Project"),
-                  onPressed: () async {
-                    final suc = await MuonEditor.createNewProject();
-                    if (suc == true) {
-                      Navigator.of(context, rootNavigator: true).pop();
-                    }
-                  }),
-              SizedBox(height: 10),
+                child: const Text("Create New Project"),
+                onPressed: () async {
+                  final suc = await MuonEditor.createNewProject();
+                  if (suc == true) {
+                    Navigator.of(context, rootNavigator: true).pop();
+                  }
+                },
+              ),
+              const SizedBox(height: 10),
               ElevatedButton(
-                  child: Text("Open Project"),
-                  onPressed: () async {
-                    final suc = await MuonEditor.openProject(context);
-                    if (suc == true) {
-                      Navigator.of(context, rootNavigator: true).pop();
-                    }
-                  })
+                child: const Text("Open Project"),
+                onPressed: () async {
+                  final suc = await MuonEditor.openProject(context);
+                  if (suc == true) {
+                    Navigator.of(context, rootNavigator: true).pop();
+                  }
+                },
+              ),
             ],
           ),
         ),
         actions: <Widget>[
           TextButton(
-            child: Text("About"),
+            child: const Text("About"),
             onPressed: () {
               showAboutDialog(
                 context: context,
@@ -47,7 +49,7 @@ class MuonWelcomeDialog extends StatelessWidget {
             },
           ),
           OutlinedButton(
-            child: Text("Quit"),
+            child: const Text("Quit"),
             onPressed: () {
               exit(0);
             },

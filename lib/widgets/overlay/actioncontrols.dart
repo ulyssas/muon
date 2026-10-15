@@ -1,7 +1,6 @@
 import "package:flutter/material.dart";
 import "package:muon/actions/base.dart";
 import "package:muon/editor.dart";
-import "package:muon/synaps_compat.dart";
 
 class MuonActionControls extends StatelessWidget {
   const MuonActionControls({
@@ -18,19 +17,20 @@ class MuonActionControls extends StatelessWidget {
     final themeData = Theme.of(context);
     return Container(
       height: 34,
-      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-      padding: EdgeInsets.only(left: 15),
+      margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+      padding: const EdgeInsets.only(left: 15),
       decoration: BoxDecoration(
-          color: isPerformed
-              ? themeData.cardColor.withOpacity(0.9)
-              : themeData.cardColor.withOpacity(0.3),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.5),
-              blurRadius: 1,
-              spreadRadius: 1,
-            ),
-          ]),
+        color: isPerformed
+            ? themeData.cardColor.withValues(alpha: 0.9)
+            : themeData.cardColor.withValues(alpha: 0.3),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 1,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
       child: Row(
         children: [
           Align(
@@ -50,9 +50,7 @@ class MuonActionControls extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
-            child: Container(),
-          ),
+          Expanded(child: Container()),
           IconButton(
             icon: isPerformed ? const Icon(Icons.undo) : const Icon(Icons.redo),
             tooltip: isPerformed ? "Undo" : "Redo",

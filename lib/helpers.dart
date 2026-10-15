@@ -1,5 +1,5 @@
 int roundToModulus(int n, int mod) {
-  int rem = n % mod;
+  final int rem = n % mod;
   n = n - rem;
 
   if (rem.abs() >= (mod ~/ 2).abs()) {
@@ -10,14 +10,14 @@ int roundToModulus(int n, int mod) {
 }
 
 int floorToModulus(int n, int mod) {
-  int rem = n % mod;
+  final int rem = n % mod;
   n = n - rem;
 
   return n;
 }
 
 int ceilToModulus(int n, int mod) {
-  int rem = n % mod;
+  final int rem = n % mod;
   n = n - rem;
 
   return n + mod;

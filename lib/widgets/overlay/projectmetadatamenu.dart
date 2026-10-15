@@ -10,23 +10,25 @@ class MuonProjectMetadataMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        child: Column(
-      children: [
-        SizedBox(height: 10),
-        Align(
+      child: Column(
+        children: [
+          const SizedBox(height: 10),
+          const Align(
             alignment: Alignment.center,
-            child: Text(
-              "Project Settings",
-              style: TextStyle(fontSize: 26),
-            )),
-        SizedBox(height: 10),
-        Align(
+            child: Text("Project Settings", style: TextStyle(fontSize: 26)),
+          ),
+          const SizedBox(height: 10),
+          Align(
             alignment: Alignment.center,
-            child: Rx(() => Text(
-                  "${currentProject.bpm} BPM",
-                  style: TextStyle(fontSize: 16),
-                ))),
-        Rx(() => Slider(
+            child: Rx(
+              () => Text(
+                "${currentProject.bpm} BPM",
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+          Rx(
+            () => Slider(
               value: currentProject.bpm,
               min: 40,
               max: 240,
@@ -36,15 +38,20 @@ class MuonProjectMetadataMenu extends StatelessWidget {
                 currentProject.bpm = value.floorToDouble();
                 currentProject.markAllVoicesAsChanged();
               },
-            )),
-        SizedBox(height: 10),
-        Align(
+            ),
+          ),
+          const SizedBox(height: 10),
+          Align(
             alignment: Alignment.center,
-            child: Rx(() => Text(
-                  "${currentProject.beatsPerMeasure} Beats per Measure",
-                  style: TextStyle(fontSize: 16),
-                ))),
-        Rx(() => Slider(
+            child: Rx(
+              () => Text(
+                "${currentProject.beatsPerMeasure} Beats per Measure",
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+          Rx(
+            () => Slider(
               value: currentProject.beatsPerMeasure.toDouble(),
               min: 1,
               max: 32,
@@ -54,15 +61,20 @@ class MuonProjectMetadataMenu extends StatelessWidget {
                 currentProject.beatsPerMeasure = value.round();
                 currentProject.markAllVoicesAsChanged();
               },
-            )),
-        SizedBox(height: 10),
-        Align(
+            ),
+          ),
+          const SizedBox(height: 10),
+          Align(
             alignment: Alignment.center,
-            child: Rx(() => Text(
-                  "Beat Value of 1 / ${currentProject.beatValue}",
-                  style: TextStyle(fontSize: 16),
-                ))),
-        Rx(() => Slider(
+            child: Rx(
+              () => Text(
+                "Beat Value of 1 / ${currentProject.beatValue}",
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+          Rx(
+            () => Slider(
               value: log(currentProject.beatValue) / log(2),
               min: 1,
               max: 5,
@@ -72,8 +84,10 @@ class MuonProjectMetadataMenu extends StatelessWidget {
                 currentProject.beatValue = pow(2, value.round()).toInt();
                 currentProject.markAllVoicesAsChanged();
               },
-            )),
-      ],
-    ));
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

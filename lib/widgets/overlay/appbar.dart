@@ -9,44 +9,46 @@ class MuonAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MuonAppBar({super.key});
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text("Muon Editor"),
+      title: const Text("Muon Editor"),
       actions: [
         IconButton(
           icon: const Icon(Icons.exposure_plus_1),
           tooltip: "Add subdivision",
           onPressed: () {
-            currentProject
-                .setSubdivision(currentProject.currentSubdivision + 1);
+            currentProject.setSubdivision(
+              currentProject.currentSubdivision + 1,
+            );
           },
         ),
         IconButton(
           icon: const Icon(Icons.exposure_minus_1),
           tooltip: "Subtract subdivision",
           onPressed: () {
-            currentProject
-                .setSubdivision(max(1, currentProject.currentSubdivision - 1));
+            currentProject.setSubdivision(
+              max(1, currentProject.currentSubdivision - 1),
+            );
           },
         ),
-        SizedBox(
-          width: 40,
+        const SizedBox(width: 40),
+        Rx(
+          () => IconButton(
+            icon: const Icon(Icons.play_arrow),
+            tooltip: "Play",
+            color: currentProject.internalStatus == "compiling"
+                ? Colors.yellow
+                : currentProject.internalStatus == "playing"
+                ? Colors.green
+                : Colors.white,
+            onPressed: () {
+              MuonEditor.playAudio(context);
+            },
+          ),
         ),
-        Rx(() => IconButton(
-              icon: const Icon(Icons.play_arrow),
-              tooltip: "Play",
-              color: currentProject.internalStatus == "compiling"
-                  ? Colors.yellow
-                  : currentProject.internalStatus == "playing"
-                      ? Colors.green
-                      : Colors.white,
-              onPressed: () {
-                MuonEditor.playAudio(context);
-              },
-            )),
         IconButton(
           icon: const Icon(Icons.stop),
           tooltip: "Stop",
@@ -54,9 +56,7 @@ class MuonAppBar extends StatelessWidget implements PreferredSizeWidget {
             MuonEditor.stopAudio();
           },
         ),
-        SizedBox(
-          width: 40,
-        ),
+        const SizedBox(width: 40),
         IconButton(
           icon: const Icon(Icons.timer),
           tooltip: "Calculate phoneme labels",
@@ -75,19 +75,19 @@ class MuonAppBar extends StatelessWidget implements PreferredSizeWidget {
             }
           },
         ),
-        Rx(() => IconButton(
-              icon: const Icon(Icons.computer),
-              color: currentProject.internalStatus == "compiling_nsf"
-                  ? Colors.yellow
-                  : Colors.white,
-              tooltip: "Render with NSF",
-              onPressed: () {
-                MuonEditor.compileVoiceInternalNSF(context);
-              },
-            )),
-        SizedBox(
-          width: 40,
+        Rx(
+          () => IconButton(
+            icon: const Icon(Icons.computer),
+            color: currentProject.internalStatus == "compiling_nsf"
+                ? Colors.yellow
+                : Colors.white,
+            tooltip: "Render with NSF",
+            onPressed: () {
+              MuonEditor.compileVoiceInternalNSF(context);
+            },
+          ),
         ),
+        const SizedBox(width: 40),
         Rx(
           () => IconButton(
             icon: appSettings.darkMode
@@ -99,9 +99,7 @@ class MuonAppBar extends StatelessWidget implements PreferredSizeWidget {
             },
           ),
         ),
-        SizedBox(
-          width: 40,
-        ),
+        const SizedBox(width: 40),
         IconButton(
           icon: const Icon(Icons.save),
           tooltip: "Save",
@@ -123,9 +121,7 @@ class MuonAppBar extends StatelessWidget implements PreferredSizeWidget {
             MuonEditor.createNewProject();
           },
         ),
-        SizedBox(
-          width: 20,
-        ),
+        const SizedBox(width: 20),
       ],
     );
   }

@@ -2,8 +2,8 @@ import "dart:async";
 
 import "package:flutter/material.dart";
 import "package:muon/editor.dart";
-import "package:muon/widgets/overlay/actioncontrols.dart";
 import "package:muon/synaps_compat.dart";
+import "package:muon/widgets/overlay/actioncontrols.dart";
 
 class MuonActionsMenu extends StatelessWidget {
   MuonActionsMenu({super.key});
@@ -15,14 +15,16 @@ class MuonActionsMenu extends StatelessWidget {
     int lastLength = 0;
     final themeData = Theme.of(context);
     return Container(
-      decoration:
-          BoxDecoration(color: themeData.scaffoldBackgroundColor, boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.5),
-          blurRadius: 1,
-          spreadRadius: 1,
-        ),
-      ]),
+      decoration: BoxDecoration(
+        color: themeData.scaffoldBackgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 1,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
       child: Column(
         verticalDirection: VerticalDirection.up,
         children: [
@@ -52,7 +54,7 @@ class MuonActionsMenu extends StatelessWidget {
                         _controller.position.maxScrollExtent /
                             currentProject.actions.length *
                             currentProject.nextActionPos,
-                        duration: Duration(milliseconds: 200),
+                        duration: const Duration(milliseconds: 200),
                         curve: Curves.fastOutSlowIn,
                       );
                     }
@@ -66,36 +68,36 @@ class MuonActionsMenu extends StatelessWidget {
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(vertical: 5),
+            padding: const EdgeInsets.symmetric(vertical: 5),
             decoration: BoxDecoration(
-                color: themeData.scaffoldBackgroundColor,
-                boxShadow: [
-                  BoxShadow(
-                    offset: Offset(0, 5),
-                    color: Colors.black.withValues(alpha: 0.2),
-                    blurRadius: 3,
-                    spreadRadius: 1,
-                  ),
-                ]),
+              color: themeData.scaffoldBackgroundColor,
+              boxShadow: [
+                BoxShadow(
+                  offset: const Offset(0, 5),
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 3,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
             child: Stack(
               children: [
-                Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Actions",
-                      style: TextStyle(fontSize: 26),
-                    )),
+                const Align(
+                  alignment: Alignment.center,
+                  child: Text("Actions", style: TextStyle(fontSize: 26)),
+                ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: Transform.translate(
-                    offset: Offset(-5, 0),
+                    offset: const Offset(-5, 0),
                     child: IconButton(
                       icon: const Icon(Icons.restore),
                       tooltip: "Redo all",
                       onPressed: () {
                         if (currentProject.actions.isNotEmpty) {
-                          currentProject
-                              .redoUntilAction(currentProject.actions.last);
+                          currentProject.redoUntilAction(
+                            currentProject.actions.last,
+                          );
                         }
                       },
                     ),

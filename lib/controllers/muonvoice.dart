@@ -1,7 +1,7 @@
 import "dart:io";
 
-import "package:flutter/material.dart";
 import "package:audioplayers/audioplayers.dart";
+import "package:flutter/material.dart";
 import "package:muon/actions/addnote.dart";
 import "package:muon/controllers/muonnote.dart";
 import "package:muon/controllers/muonproject.dart";
@@ -99,8 +99,9 @@ class MuonVoiceController with WeakEqualityController {
       Directory(project.getProjectFilePath("label/mono/")).createSync();
     }
 
-    final musicXMLPath =
-        project.getProjectFilePath("musicxml/$voiceFileName.musicxml");
+    final musicXMLPath = project.getProjectFilePath(
+      "musicxml/$voiceFileName.musicxml",
+    );
 
     File(musicXMLPath).writeAsStringSync(musicXMLString);
 
@@ -190,20 +191,18 @@ class MuonVoiceController with WeakEqualityController {
       Directory(project.getProjectFilePath("audio/")).createSync();
     }
 
-    await Process.run(
-            MuonHelpers.getProgramPath("NSF_IO"),
-            [
-              project.getProjectFilePath("label/full/$voiceFileName.lab"),
-              project.getProjectFilePath("label/timing/$voiceFileName.lab"),
-              project.getProjectFilePath("neutrino/$voiceFileName.f0"),
-              project.getProjectFilePath("neutrino/$voiceFileName.mgc"),
-              project.getProjectFilePath("neutrino/$voiceFileName.bap"),
-              modelName,
-              project.getProjectFilePath("audio/${voiceFileName}_nsf.wav"),
-              "-t",
-            ],
-            workingDirectory: MuonHelpers.getRawProgramPath(""))
-        .then((ProcessResult results) {
+    await Process.run(MuonHelpers.getProgramPath("NSF_IO"), [
+      project.getProjectFilePath("label/full/$voiceFileName.lab"),
+      project.getProjectFilePath("label/timing/$voiceFileName.lab"),
+      project.getProjectFilePath("neutrino/$voiceFileName.f0"),
+      project.getProjectFilePath("neutrino/$voiceFileName.mgc"),
+      project.getProjectFilePath("neutrino/$voiceFileName.bap"),
+      modelName,
+      project.getProjectFilePath("audio/${voiceFileName}_nsf.wav"),
+      "-t",
+    ], workingDirectory: MuonHelpers.getRawProgramPath("")).then((
+      ProcessResult results,
+    ) {
       print(results.stdout);
     });
   }
@@ -216,7 +215,9 @@ class MuonVoiceController with WeakEqualityController {
 
     await audioPlayer!.stop();
 
-    final wavPath = project.getProjectFilePath("audio/${voiceFileName}_world.wav");
+    final wavPath = project.getProjectFilePath(
+      "audio/${voiceFileName}_world.wav",
+    );
     try {
       await audioPlayer!.setSource(DeviceFileSource(wavPath));
 
@@ -243,8 +244,10 @@ class MuonVoiceController with WeakEqualityController {
     return out;
   }
 
-  static MuonVoiceController fromSerializable(MuonVoice obj,
-      [MuonProjectController? project]) {
+  static MuonVoiceController fromSerializable(
+    MuonVoice obj, [
+    MuonProjectController? project,
+  ]) {
     final out = MuonVoiceController().ctx();
     out.project =
         project ?? MuonProjectController.fromSerializable(obj.project);
