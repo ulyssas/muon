@@ -825,14 +825,16 @@ class PianoRollPainter extends CustomPainter {
     canvas.save();
 
     // draw selection rect on untransformed canvas
-    final selPaintBorder = Paint();
-    selPaintBorder.color = Colors.blue.withValues(alpha: 0.75);
-    selPaintBorder.style = PaintingStyle.stroke;
-    final selPaint = Paint();
-    selPaint.color = Colors.blue.withValues(alpha: 0.3);
-    selPaint.style = PaintingStyle.fill;
-    canvas.drawRect(selectionRect, selPaintBorder);
-    canvas.drawRect(selectionRect, selPaint);
+    if (selectionRect != null) {
+      final selPaintBorder = Paint();
+      selPaintBorder.color = Colors.blue.withValues(alpha: 0.75);
+      selPaintBorder.style = PaintingStyle.stroke;
+      final selPaint = Paint();
+      selPaint.color = Colors.blue.withValues(alpha: 0.3);
+      selPaint.style = PaintingStyle.fill;
+      canvas.drawRect(selectionRect, selPaintBorder);
+      canvas.drawRect(selectionRect, selPaint);
+    }
 
     // set up piano keys scaling
     canvas.scale(1, yScale);

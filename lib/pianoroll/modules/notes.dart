@@ -117,9 +117,7 @@ class PianoRollNotesModule extends PianoRollModule {
   bool hitTest(Point point) {
     final noteAtCursor = getNoteAtScreenPos(point);
 
-    return true;
-
-    return false;
+    return noteAtCursor != null;
   }
 
   @override
@@ -155,6 +153,8 @@ class PianoRollNotesModule extends PianoRollModule {
         selectedNotes[note] = false;
       });
     }
+
+    if (noteAtCursor == null) return;
 
     if (numClicks == 1) {
       if (selectedNotes[noteAtCursor] == null) {
@@ -253,6 +253,8 @@ class PianoRollNotesModule extends PianoRollModule {
   void onDragStart(PointerEvent mouseEvent, Point mouseStartPos) {
     final noteAtCursor = getNoteAtScreenPos(mouseStartPos);
 
+    if (noteAtCursor == null) return;
+
     _internalDragFirstNote = noteAtCursor;
 
     noteDragOriginalData = {};
@@ -268,6 +270,9 @@ class PianoRollNotesModule extends PianoRollModule {
   @override
   void onDragging(PointerEvent mouseEvent, Point mouseStartPos) {
     final note = _internalDragFirstNote;
+
+    if (note == null) return;
+
     final mousePos =
         Point(mouseEvent.localPosition.dx, mouseEvent.localPosition.dy);
 
@@ -282,7 +287,9 @@ class PianoRollNotesModule extends PianoRollModule {
 
     selectedNotes[note] = true;
 
-    var originalFirstNote = noteDragOriginalData[note];
+    final originalFirstNote = noteDragOriginalData[note];
+    if (originalFirstNote == null) return;
+
     var mouseBeats = painter.getBeatNumAtCursor(mouseStartPos.x.toDouble());
     var endBeat = (originalFirstNote.startAtTime + originalFirstNote.duration) /
         project.timeUnitsPerBeat;
@@ -315,10 +322,11 @@ class PianoRollNotesModule extends PianoRollModule {
 
     for (final selectedNote in selectedNotes.keys) {
       if (selectedNotes[selectedNote] == true) {
-        if (noteDragOriginalData[selectedNote] != null) {
+        final originalData = noteDragOriginalData[selectedNote];
+        if (originalData != null) {
           if (resizeMode) {
             selectedNote.duration =
-                noteDragOriginalData[selectedNote].duration + resizeDelta;
+                originalData.duration + resizeDelta;
             if (state.isShiftKeyHeld) {
               selectedNote.duration = max(
                   project.timeUnitsPerSubdivision,
@@ -330,14 +338,14 @@ class PianoRollNotesModule extends PianoRollModule {
             }
           } else {
             selectedNote.startAtTime = max(0,
-                noteDragOriginalData[selectedNote].startAtTime + deltaSegments);
+                originalData.startAtTime + deltaSegments);
             if (state.isShiftKeyHeld) {
               selectedNote.startAtTime = floorToModulus(
                   selectedNote.startAtTime, project.timeUnitsPerSubdivision);
             }
 
-            selectedNote.note = noteDragOriginalData[selectedNote].note;
-            selectedNote.octave = noteDragOriginalData[selectedNote].octave;
+            selectedNote.note = originalData.note;
+            selectedNote.octave = originalData.octave;
             selectedNote.addSemitones(deltaSemiTones.floor());
           }
         }

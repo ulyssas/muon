@@ -57,8 +57,11 @@ class MuonEditor extends StatefulWidget {
 
       if (file != null) {
         final proj = MuonProjectController.loadFromFile(file.path);
-        currentProject.updateWith(proj);
-        return true;
+        if (proj != null){
+          currentProject.updateWith(proj);
+          return true;
+        }
+        return false;
       }
       return false;
     } catch (err) {

@@ -231,14 +231,15 @@ class MusicXML {
   /// it may no longer accept any note merges.
   ///
   void mergeNote(MusicXMLEventNote noteEvent, bool resolve) {
-    if (lastNote.compoundNote && !lastNote.compoundNoteResolved) {
-      if (lastNote.pitch.isEqualTo(noteEvent.pitch)) {
+    final curNote = lastNote;
+    if (curNote != null && curNote.compoundNote && !curNote.compoundNoteResolved) {
+      if (curNote.pitch.isEqualTo(noteEvent.pitch)) {
         absoluteDuration = absoluteDuration + noteEvent.absoluteDuration;
 
-        lastNote.duration += noteEvent.duration;
+        curNote.duration += noteEvent.duration;
         duration = duration + noteEvent.duration;
 
-        lastNote.compoundNoteResolved = resolve;
+        curNote.compoundNoteResolved = resolve;
 
         return;
       }
@@ -329,16 +330,18 @@ class MusicXMLUtils {
   }
 
   static String _getChildText(html.Element el, String tag, String defaultVal) {
-    var child = _getChildElement(el, tag);
-    return child.text;
+    final child = _getChildElement(el, tag);
+    if (child != null){
+      return child.text ?? defaultVal;
+    }
 
     return defaultVal;
   }
 
   static String _getChildAttributeText(
       html.Element el, String tag, String attribute, String defaultVal) {
-    var child = _getChildElement(el, tag);
-    if (child.attributes[attribute] != null) {
+    final child = _getChildElement(el, tag);
+    if (child != null && child.attributes.containsKey(attribute)) {
       return child.attributes[attribute] ?? defaultVal;
     }
 

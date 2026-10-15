@@ -34,6 +34,8 @@ class PianoRollWAILAModule extends PianoRollModule {
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (state.curMousePos == null) return;
+
     final curMousePos = state.curMousePos;
     final themeData = painter.themeData;
 

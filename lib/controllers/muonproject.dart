@@ -610,11 +610,13 @@ class MuonProjectController with WeakEqualityController {
   static MuonProjectController loadFromDir(
       String projectDir, String projectFileName) {
     final serializable = MuonProject.loadFromDir(projectDir, projectFileName);
+    if (serializable == null) return null;
     return MuonProjectController.fromSerializable(serializable);
   }
 
   static MuonProjectController loadFromFile(String projectFile) {
     final serializable = MuonProject.loadFromFile(projectFile);
+    if (serializable == null) return null;
     return MuonProjectController.fromSerializable(serializable);
   }
 
