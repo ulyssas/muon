@@ -42,7 +42,7 @@ class PianoRollWAILAModule extends PianoRollModule {
     // clear all transforms
     canvas.restore();
 
-    final mouseBeatNum = max(0, painter.getBeatNumAtCursor(curMousePos.x.toDouble()));
+    final mouseBeatNum = max(0, painter.getBeatNumAtCursor(curMousePos!.x.toDouble()));
     final mouseBeatSubDivNum =
         (((mouseBeatNum * project.timeUnitsPerBeat).floor() %
                     project.timeUnitsPerBeat) ~/

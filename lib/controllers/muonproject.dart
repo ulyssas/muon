@@ -95,10 +95,10 @@ class MuonProjectController with WeakEqualityController {
 
   /// Internal timer registered by this class to track the playhead
   /// TODO: this should be removed once FFI is complete
-  Timer playbackTimer;
+  Timer? playbackTimer;
 
   void dispose() {
-    playbackTimer.cancel();
+    playbackTimer?.cancel();
     playbackTimer = null;
   }
 
@@ -607,14 +607,14 @@ class MuonProjectController with WeakEqualityController {
     serializable.save();
   }
 
-  static MuonProjectController loadFromDir(
+  static MuonProjectController? loadFromDir(
       String projectDir, String projectFileName) {
     final serializable = MuonProject.loadFromDir(projectDir, projectFileName);
     if (serializable == null) return null;
     return MuonProjectController.fromSerializable(serializable);
   }
 
-  static MuonProjectController loadFromFile(String projectFile) {
+  static MuonProjectController? loadFromFile(String projectFile) {
     final serializable = MuonProject.loadFromFile(projectFile);
     if (serializable == null) return null;
     return MuonProjectController.fromSerializable(serializable);

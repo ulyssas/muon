@@ -16,7 +16,7 @@ class MuonSettings {
       _$MuonSettingsFromJson(json);
   Map<String, dynamic> toJson() => _$MuonSettingsToJson(this);
 
-  static MuonSettings loadFromFile(
+  static MuonSettings? loadFromFile(
       [String settingsFile = "muon_settings.json"]) {
     if (File(settingsFile).existsSync()) {
       final file = File(settingsFile);

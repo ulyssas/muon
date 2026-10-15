@@ -71,7 +71,7 @@ class MuonProject {
       _$MuonProjectFromJson(json);
   Map<String, dynamic> toJson() => _$MuonProjectToJson(this);
 
-  static MuonProject loadFromFile(String projectFile) {
+  static MuonProject? loadFromFile(String projectFile) {
     if (File(projectFile).existsSync()) {
       final file = File(projectFile);
 
@@ -95,7 +95,7 @@ class MuonProject {
     return null;
   }
 
-  static MuonProject loadFromDir(String projectDir, String projectFileName) {
+  static MuonProject? loadFromDir(String projectDir, String projectFileName) {
     if (Directory(projectDir).existsSync()) {
       return MuonProject.loadFromFile("$projectDir/$projectFileName");
     }

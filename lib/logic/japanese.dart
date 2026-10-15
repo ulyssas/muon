@@ -212,8 +212,8 @@ class JapaneseUTF8 {
 
     return _charRegex
         .allMatches(hiragana)
-        .toList()
-        .map((RegExpMatch val) => val.group(0))
+        .map((match) => match.group(0))
+        .whereType<String>()
         .toList();
   }
 }

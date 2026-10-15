@@ -42,7 +42,7 @@ int _toAbsoluteSemitones(String note, int octave) {
 class PianoRollNotesModule extends PianoRollModule {
   final SynapsMap<MuonNoteController, bool> selectedNotes;
 
-  MuonNoteController _internalDragFirstNote;
+  MuonNoteController? _internalDragFirstNote;
   Map<MuonNoteController, MuonNote> noteDragOriginalData = {};
 
   PianoRollNotesModule({
@@ -72,7 +72,7 @@ class PianoRollNotesModule extends PianoRollModule {
   }
 
   /// Get the note under where the mouse is
-  MuonNoteController getNoteAtScreenPos(Point screenPos) {
+  MuonNoteController? getNoteAtScreenPos(Point screenPos) {
     // O(n), LOOK AWAY!
     // I DON'T CARE
 
@@ -126,6 +126,10 @@ class PianoRollNotesModule extends PianoRollModule {
         Point(mouseEvent.localPosition.dx, mouseEvent.localPosition.dy);
     final noteAtCursor = getNoteAtScreenPos(mousePos);
 
+    if (noteAtCursor == null) {
+      state.setCursor(SystemMouseCursors.basic);
+      return;
+    }
     var mouseBeats = painter.getBeatNumAtCursor(mousePos.x);
     var endBeat = (noteAtCursor.startAtTime + noteAtCursor.duration) /
         project.timeUnitsPerBeat;
@@ -157,10 +161,7 @@ class PianoRollNotesModule extends PianoRollModule {
     if (noteAtCursor == null) return;
 
     if (numClicks == 1) {
-      if (selectedNotes[noteAtCursor] == null) {
-        selectedNotes[noteAtCursor] = false;
-      }
-      selectedNotes[noteAtCursor] = !selectedNotes[noteAtCursor];
+      selectedNotes[noteAtCursor] = !(selectedNotes[noteAtCursor] ?? false);
     } else if (numClicks == 2) {
       selectedNotes[noteAtCursor] = true;
 
@@ -214,7 +215,7 @@ class PianoRollNotesModule extends PianoRollModule {
                     newNoteLyrics[noteAtCursor.voice.notes[i]] =
                         hiraganaList[i - curNotePos];
                   } else if (editHistory.containsKey(i)) {
-                    noteAtCursor.voice.notes[i].lyric = editHistory[i];
+                    noteAtCursor.voice.notes[i].lyric = editHistory[i]!;
                   }
                 }
 
@@ -366,12 +367,12 @@ class PianoRollNotesModule extends PianoRollModule {
       if (selectedNotes[otherNote] == true) {
         notes.add(otherNote);
         timeDeltas.add(otherNote.startAtTime -
-            noteDragOriginalData[otherNote].startAtTime);
+            noteDragOriginalData[otherNote]!.startAtTime);
         semitoneDeltas.add(otherNote.toAbsoluteSemitones() -
-            _toAbsoluteSemitones(noteDragOriginalData[otherNote].note,
-                noteDragOriginalData[otherNote].octave));
+            _toAbsoluteSemitones(noteDragOriginalData[otherNote]!.note,
+                noteDragOriginalData[otherNote]!.octave));
         durationDeltas
-            .add(otherNote.duration - noteDragOriginalData[otherNote].duration);
+            .add(otherNote.duration - noteDragOriginalData[otherNote]!.duration);
       }
     }
 
