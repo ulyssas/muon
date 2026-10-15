@@ -11,7 +11,7 @@ import "package:muon/editor.dart";
 import "package:muon/logic/musicxml.dart";
 import "package:muon/serializable/muon.dart";
 import "package:path/path.dart" as p;
-import "package:synaps_flutter/synaps_flutter.dart";
+import "package:muon/synaps_compat.dart";
 
 ///
 /// The main class where the muon project is stored.
@@ -112,6 +112,7 @@ class MuonProjectController with WeakEqualityController {
     actions.add(action);
     nextActionPos++;
     action.markVoiceModified();
+    SynapsHub.notify();
   }
 
   /// Undo an action
@@ -120,6 +121,7 @@ class MuonProjectController with WeakEqualityController {
       nextActionPos--;
       actions[nextActionPos].undo();
       actions[nextActionPos].markVoiceModified();
+      SynapsHub.notify();
     }
   }
 
@@ -129,6 +131,7 @@ class MuonProjectController with WeakEqualityController {
       actions[nextActionPos].perform();
       actions[nextActionPos].markVoiceModified();
       nextActionPos++;
+      SynapsHub.notify();
     }
   }
 
@@ -169,6 +172,7 @@ class MuonProjectController with WeakEqualityController {
     for (final voice in voices) {
       voice.hasChangedNoteData = true;
     }
+    SynapsHub.notify();
   }
 
   // MISCELLANEOUS METHODS

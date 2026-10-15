@@ -7,7 +7,7 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:muon/controllers/muonnote.dart";
 import "package:muon/controllers/muonproject.dart";
-import "package:synaps_flutter/synaps_flutter.dart";
+import "package:muon/synaps_compat.dart";
 
 class PianoRollPitch {
   late String note;

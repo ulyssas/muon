@@ -16,7 +16,7 @@ import "package:muon/helpers.dart";
 import "package:muon/logic/japanese.dart";
 import "package:muon/pianoroll/pianoroll.dart";
 import "package:muon/serializable/muon.dart";
-import "package:synaps_flutter/synaps_flutter.dart";
+import "package:muon/synaps_compat.dart";
 
 int _toAbsoluteSemitones(String note, int octave) {
   const midiNotes = [
@@ -156,12 +156,14 @@ class PianoRollNotesModule extends PianoRollModule {
       selectedNotes.forEach((note, isActive) {
         selectedNotes[note] = false;
       });
+      SynapsHub.notify();
     }
 
     if (noteAtCursor == null) return;
 
     if (numClicks == 1) {
       selectedNotes[noteAtCursor] = !(selectedNotes[noteAtCursor] ?? false);
+      SynapsHub.notify();
     } else if (numClicks == 2) {
       selectedNotes[noteAtCursor] = true;
 
@@ -177,6 +179,7 @@ class PianoRollNotesModule extends PianoRollModule {
 
       String lastInput = "";
       final newNoteLyrics = <MuonNoteController, String>{};
+      SynapsHub.notify();
 
       showMenu<void>(
         context: context,
@@ -354,6 +357,7 @@ class PianoRollNotesModule extends PianoRollModule {
     }
 
     project.playheadTime = note.startAtTime / project.timeUnitsPerBeat;
+    SynapsHub.notify();
   }
 
   @override
@@ -428,6 +432,7 @@ class PianoRollNotesModule extends PianoRollModule {
             selectedNotes[note] = true;
           }
         }
+        SynapsHub.notify();
       } else if (keyEvent.isKeyPressed(LogicalKeyboardKey.keyC) ||
           keyEvent.isKeyPressed(LogicalKeyboardKey.keyX)) {
         // copy / cut
@@ -501,9 +506,8 @@ class PianoRollNotesModule extends PianoRollModule {
       final noteList = getSelectedNotesAsList();
       if (noteList.isNotEmpty) {
         final action = DeleteNoteAction(noteList);
-        project.addAction(action);
-
         selectedNotes.clear();
+        project.addAction(action);
       }
     } else if (keyEvent.isKeyPressed(LogicalKeyboardKey.arrowUp)) {
       int moveBy = keyEvent.isShiftPressed ? 12 : 1;

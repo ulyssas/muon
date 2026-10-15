@@ -4,7 +4,7 @@ import "package:muon/controllers/muonvoice.dart";
 import "package:muon/editor.dart";
 import "package:muon/logic/musicxml.dart";
 import "package:muon/widgets/overlay/voicecontrols.dart";
-import "package:synaps_flutter/synaps_flutter.dart";
+import "package:muon/synaps_compat.dart";
 
 class MuonVoicesMenu extends StatelessWidget {
   const MuonVoicesMenu({super.key});

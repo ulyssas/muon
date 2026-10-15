@@ -1,4 +1,4 @@
-import "package:synaps_flutter/synaps_flutter.dart";
+import "package:muon/synaps_compat.dart";
 
 abstract class MuonAction {
   /// Human readable title of the action

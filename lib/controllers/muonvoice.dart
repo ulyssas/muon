@@ -8,7 +8,7 @@ import "package:muon/controllers/muonproject.dart";
 import "package:muon/logic/helpers.dart";
 import "package:muon/logic/musicxml.dart";
 import "package:muon/serializable/muon.dart";
-import "package:synaps_flutter/synaps_flutter.dart";
+import "package:muon/synaps_compat.dart";
 
 @Controller()
 class MuonVoiceController with WeakEqualityController {

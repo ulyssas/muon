@@ -1,6 +1,6 @@
 import "package:muon/controllers/muonvoice.dart";
 import "package:muon/serializable/muon.dart";
-import "package:synaps_flutter/synaps_flutter.dart";
+import "package:muon/synaps_compat.dart";
 
 @Controller()
 class MuonNoteController with WeakEqualityController {

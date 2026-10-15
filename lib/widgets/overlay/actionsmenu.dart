@@ -3,7 +3,7 @@ import "dart:async";
 import "package:flutter/material.dart";
 import "package:muon/editor.dart";
 import "package:muon/widgets/overlay/actioncontrols.dart";
-import "package:synaps_flutter/synaps_flutter.dart";
+import "package:muon/synaps_compat.dart";
 
 class MuonActionsMenu extends StatelessWidget {
   MuonActionsMenu({super.key});

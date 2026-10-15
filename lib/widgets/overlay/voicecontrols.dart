@@ -6,7 +6,7 @@ import "package:muon/actions/removevoice.dart";
 import "package:muon/controllers/muonvoice.dart";
 import "package:muon/editor.dart";
 import "package:muon/logic/helpers.dart";
-import "package:synaps_flutter/synaps_flutter.dart";
+import "package:muon/synaps_compat.dart";
 
 class MuonVoiceControls extends StatelessWidget {
   const MuonVoiceControls({
