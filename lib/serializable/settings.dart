@@ -5,7 +5,7 @@ import "package:json_annotation/json_annotation.dart";
 
 part "settings.g.dart";
 
-@JsonSerializable(nullable: false)
+@JsonSerializable()
 class MuonSettings {
   MuonSettings();
 
@@ -46,5 +46,5 @@ class MuonSettings {
 MuonSettings getMuonSettings() {
   var settings = MuonSettings.loadFromFile();
 
-  return settings;
+  return settings ?? MuonSettings();
 }

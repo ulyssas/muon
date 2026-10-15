@@ -10,13 +10,13 @@ import "package:muon/controllers/muonproject.dart";
 import "package:synaps_flutter/synaps_flutter.dart";
 
 class PianoRollPitch {
-  String note;
-  int octave;
+  late String note;
+  late int octave;
 }
 
 class PianoRollControls {
-  PianoRollPainter painter;
-  _PianoRollState state;
+  late PianoRollPainter painter;
+  late _PianoRollState state;
 }
 
 typedef _onMouseHoverCallbackType = void Function(

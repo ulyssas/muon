@@ -42,7 +42,7 @@ class MoveNoteAction extends MuonAction {
   int get timeDeltaMax => timeDelta.reduce(max);
   int get semitoneDeltaMax => semitoneDelta.reduce(max);
 
-  int cachedProjectTimeUnitsPerBeat;
+  late int cachedProjectTimeUnitsPerBeat;
 
   int fixTimeDelta(int timeDelta) =>
       ((timeDelta * notes.first.voice.project.timeUnitsPerBeat) ~/

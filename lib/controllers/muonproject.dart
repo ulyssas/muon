@@ -231,7 +231,7 @@ class MuonProjectController with WeakEqualityController {
     selectedNotes.clear();
     for (final selectedNoteKey in controller.selectedNotes.keys) {
       selectedNotes[selectedNoteKey] =
-          controller.selectedNotes[selectedNoteKey];
+          controller.selectedNotes[selectedNoteKey] ?? false;
     }
 
     copiedNotes.clear();

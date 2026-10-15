@@ -7,14 +7,14 @@ import "package:universal_html/parsing.dart" as html show parseXmlDocument;
 class MusicXMLEvent {
   /// The time offset of this event, measured in beats (i.e. how much
   ///  time needs to pass before this event is triggered)
-  double absoluteTime;
+  double absoluteTime = 0.0;
 
   /// The time offset of this event, measured in divisions (i.e. how much
   ///  time needs to pass before this event is triggered)
   ///
   /// NB: `x` beats `= x * divisionsPerBeat` divisions
   ///
-  double time;
+  double time = 0.0;
 
   /// The duration of this event, measured in divisions
   double duration = 0;
@@ -27,19 +27,19 @@ class MusicXMLEvent {
   /// [lastTempo], [lastTimeSignature] and [lastDivision]
   MusicXMLEvent(MusicXML parent) {
     if (this is MusicXMLEventTempo) {
-      lastTempo = this;
+      lastTempo = this as MusicXMLEventTempo;
     } else {
       lastTempo = parent.lastTempo;
     }
 
     if (this is MusicXMLEventTimeSignature) {
-      lastTimeSignature = this;
+      lastTimeSignature = this as MusicXMLEventTimeSignature;
     } else {
       lastTimeSignature = parent.lastTimeSignature;
     }
 
     if (this is MusicXMLEventDivision) {
-      lastDivision = this;
+      lastDivision = this as MusicXMLEventDivision;
     } else {
       lastDivision = parent.lastDivision;
     }
@@ -49,7 +49,7 @@ class MusicXMLEvent {
   double get absoluteDuration {
     int divisions = 1;
 
-    divisions = lastDivision.divisions;
+    divisions = lastDivision.divisions ?? 1;
 
     return (duration / divisions);
   }
@@ -60,32 +60,32 @@ class MusicXMLEventDivision extends MusicXMLEvent {
 
   /// Number of divisions per beat
   /// Should never be zero
-  int divisions;
+  int divisions = 1;
 }
 
 class MusicXMLEventTempo extends MusicXMLEvent {
   MusicXMLEventTempo(super.parent);
 
   /// Beats per minute
-  double tempo;
+  double tempo = 120.0;
 }
 
 class MusicXMLEventTimeSignature extends MusicXMLEvent {
   MusicXMLEventTimeSignature(super.parent);
 
   /// Beats per measure (numerator in a time signature)
-  int beats;
+  int beats = 4;
 
   /// Quantity of each beat (denominator in a time signature)
   ///
   /// Example values are powers of 2
   /// `2`, `4`, `8`, `16`, ...
-  int beatType;
+  int beatType = 4;
 }
 
 class MusicXMLPitch {
-  int octave;
-  String note;
+  late int octave;
+  late String note;
 
   /// returns true if both pitches are on the same
   /// octave and have the same note value
@@ -105,7 +105,7 @@ class MusicXMLEventVoiced extends MusicXMLEvent {
 
   /// The MusicXML voice of this event
   /// Doesn't have any special use case in Muon
-  int voice;
+  int voice = 1;
 }
 
 class MusicXMLEventRest extends MusicXMLEventVoiced {
@@ -114,9 +114,9 @@ class MusicXMLEventRest extends MusicXMLEventVoiced {
 
 class MusicXMLEventNote extends MusicXMLEventVoiced {
   MusicXMLEventNote(super.parent);
-  String lyric;
+  String lyric = "";
 
-  MusicXMLPitch pitch;
+  late MusicXMLPitch pitch;
 
   /// Used internally to merge multiple notes
   bool compoundNote = false;
@@ -127,9 +127,9 @@ class MusicXMLEventNote extends MusicXMLEventVoiced {
 
 /// Used internally to convert divisions to note types
 class _NoteResolution {
-  String noteType;
-  int dots;
-  double beats;
+  late String noteType;
+  late int dots;
+  late double beats;
 }
 
 ///
@@ -201,7 +201,7 @@ class MusicXML {
   double noteDurationToAbsoluteTime(double noteDuration) {
     int divisions = 1;
 
-    divisions = lastDivision.divisions;
+    divisions = lastDivision.divisions ?? 1;
 
     return noteDuration / divisions;
   }
@@ -339,7 +339,7 @@ class MusicXMLUtils {
       html.Element el, String tag, String attribute, String defaultVal) {
     var child = _getChildElement(el, tag);
     if (child.attributes[attribute] != null) {
-      return child.attributes[attribute];
+      return child.attributes[attribute] ?? defaultVal;
     }
 
     return defaultVal;
@@ -410,7 +410,7 @@ class MusicXMLUtils {
               var voiceRaw = _getChildText(el, "voice", "1");
               int voice = int.parse(voiceRaw);
 
-              var durationVal = double.parse(duration.text);
+              var durationVal = double.parse(duration.text ?? "0");
 
               var rest = _getChildElement(el, "rest");
               out.rest(durationVal, voice);
@@ -761,7 +761,7 @@ class MusicXMLUtils {
           }
 
           var writeDur = min(beatsRemaining * lastDivision, duration).toDouble();
-          var noteResolution = resolveNote(writeDur);
+          var noteResolution = resolveNote(writeDur) ?? resolveNoteFallback(writeDur)!;
 
           curBeat += writeDur / lastDivision;
           beatsRemaining = max(0, curMeasureNum * lastBeats - curBeat);
@@ -827,7 +827,7 @@ class MusicXMLUtils {
           }
 
           var writeDur = min(beatsRemaining * lastDivision, duration).toDouble();
-          var noteResolution = resolveNote(writeDur);
+          var noteResolution = resolveNote(writeDur) ?? resolveNoteFallback(writeDur)!;
 
           curBeat += writeDur / lastDivision;
           beatsRemaining = max(0, curMeasureNum * lastBeats - curBeat);

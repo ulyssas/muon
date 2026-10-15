@@ -6,32 +6,32 @@ import "package:path/path.dart" as p;
 
 part "muon.g.dart";
 
-@JsonSerializable(nullable: false)
+@JsonSerializable()
 class MuonNote {
   MuonNote();
 
-  String note;
-  int octave;
-  String lyric;
+  String note = "C";
+  int octave = 4;
+  String lyric = "";
 
   // timing
-  int startAtTime;
-  int duration;
+  int startAtTime = 0;
+  int duration = 0;
 
   factory MuonNote.fromJson(Map<String, dynamic> json) =>
       _$MuonNoteFromJson(json);
   Map<String, dynamic> toJson() => _$MuonNoteToJson(this);
 }
 
-@JsonSerializable(nullable: false)
+@JsonSerializable()
 class MuonVoice {
   MuonVoice();
 
-  @JsonKey(ignore: true)
-  MuonProject project;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  late MuonProject project;
 
   // voice metadata
-  String modelName;
+  String modelName = "";
   bool randomiseTiming = false;
 
   // notes
@@ -45,17 +45,17 @@ class MuonVoice {
   Map<String, dynamic> toJson() => _$MuonVoiceToJson(this);
 }
 
-@JsonSerializable(nullable: false)
+@JsonSerializable()
 class MuonProject {
   MuonProject();
 
   // project metadata
-  @JsonKey(ignore: true)
-  String projectDir;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  late String projectDir;
 
   // project metadata
-  @JsonKey(ignore: true)
-  String projectFileName;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  late String projectFileName;
 
   // tempo
   double bpm = 120;

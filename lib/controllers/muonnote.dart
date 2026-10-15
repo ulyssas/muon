@@ -4,7 +4,7 @@ import "package:synaps_flutter/synaps_flutter.dart";
 
 @Controller()
 class MuonNoteController with WeakEqualityController {
-  MuonVoiceController voice;
+  late MuonVoiceController voice;
 
   /// The alphabetical value of this note
   /// `/[A-G]#?/`

@@ -35,7 +35,7 @@ class RetimeNoteAction extends MuonAction {
 
   int get durationDeltaMax => durationDelta.reduce(max);
 
-  int cachedProjectTimeUnitsPerBeat;
+  late int cachedProjectTimeUnitsPerBeat;
 
   int fixTimeDelta(int timeDelta) =>
       ((timeDelta * notes.first.voice.project.timeUnitsPerBeat) ~/

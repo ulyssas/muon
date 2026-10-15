@@ -25,14 +25,14 @@ class RenameNoteAction extends MuonAction {
   @override
   void perform() {
     for (final note in newLyrics.keys) {
-      note.lyric = newLyrics[note];
+      note.lyric = newLyrics[note] ?? "";
     }
   }
 
   @override
   void undo() {
     for (final note in oldLyrics.keys) {
-      note.lyric = oldLyrics[note];
+      note.lyric = oldLyrics[note] ?? "";
     }
   }
 

@@ -43,7 +43,7 @@ class PianoRollNotesModule extends PianoRollModule {
   final SynapsMap<MuonNoteController, bool> selectedNotes;
 
   MuonNoteController _internalDragFirstNote;
-  Map<MuonNoteController, MuonNote> noteDragOriginalData;
+  Map<MuonNoteController, MuonNote> noteDragOriginalData = {};
 
   PianoRollNotesModule({
     required this.selectedNotes,
@@ -52,7 +52,7 @@ class PianoRollNotesModule extends PianoRollModule {
   List<MuonNoteController> getSelectedNotesAsList() {
     final otherNotes = <MuonNoteController>[];
     for (final selectedNote in selectedNotes.keys) {
-      if (selectedNotes[selectedNote]) {
+      if (selectedNotes[selectedNote] == true) {
         otherNotes.add(selectedNote);
       }
     }
@@ -165,7 +165,7 @@ class PianoRollNotesModule extends PianoRollModule {
       selectedNotes[noteAtCursor] = true;
 
       // edit note lyrics
-      final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+      final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
 
       final initialLyricValue = noteAtCursor.lyric;
       final textController = TextEditingController(text: initialLyricValue);
@@ -236,7 +236,7 @@ class PianoRollNotesModule extends PianoRollModule {
         for (final editedNote in newNoteLyrics.keys) {
           final notePos = noteAtCursor.voice.notes.indexOf(editedNote);
           originalNoteLyrics[editedNote] =
-              editHistory[notePos] ?? newNoteLyrics[editedNote];
+              editHistory[notePos] ?? newNoteLyrics[editedNote] ?? "";
         }
 
         final action =
@@ -259,7 +259,7 @@ class PianoRollNotesModule extends PianoRollModule {
     noteDragOriginalData[noteAtCursor] = noteAtCursor.toSerializable();
 
     for (final note in selectedNotes.keys) {
-      if (selectedNotes[note]) {
+      if (selectedNotes[note] == true) {
         noteDragOriginalData[note] = note.toSerializable();
       }
     }
@@ -314,7 +314,7 @@ class PianoRollNotesModule extends PianoRollModule {
     }
 
     for (final selectedNote in selectedNotes.keys) {
-      if (selectedNotes[selectedNote]) {
+      if (selectedNotes[selectedNote] == true) {
         if (noteDragOriginalData[selectedNote] != null) {
           if (resizeMode) {
             selectedNote.duration =
@@ -355,7 +355,7 @@ class PianoRollNotesModule extends PianoRollModule {
     final notes = <MuonNoteController>[];
 
     for (final otherNote in selectedNotes.keys) {
-      if (selectedNotes[otherNote]) {
+      if (selectedNotes[otherNote] == true) {
         notes.add(otherNote);
         timeDeltas.add(otherNote.startAtTime -
             noteDragOriginalData[otherNote].startAtTime);
@@ -432,7 +432,7 @@ class PianoRollNotesModule extends PianoRollModule {
         int earliestTime =
             2147483647; // assuming int32, I cannot be bothered verifying this
         for (final selectedNote in selectedNotes.keys) {
-          if (selectedNotes[selectedNote]) {
+          if (selectedNotes[selectedNote] == true) {
             project.copiedNotesVoices.add(selectedNote.voice);
             project.copiedNotes.add(selectedNote.toSerializable());
             earliestTime = min(earliestTime, selectedNote.startAtTime);
@@ -484,7 +484,7 @@ class PianoRollNotesModule extends PianoRollModule {
 
     if (keyEvent.isKeyPressed(LogicalKeyboardKey.delete)) {
       for (final selectedNote in selectedNotes.keys) {
-        if (selectedNotes[selectedNote]) {
+        if (selectedNotes[selectedNote] == true) {
           selectedNote.voice.notes.remove(selectedNote);
         }
       }
@@ -501,7 +501,7 @@ class PianoRollNotesModule extends PianoRollModule {
 
       MuonNoteController lastNote;
       for (final selectedNote in selectedNotes.keys) {
-        if (selectedNotes[selectedNote]) {
+        if (selectedNotes[selectedNote] == true) {
           selectedNote.addSemitones(moveBy);
           lastNote = selectedNote;
         }
@@ -517,7 +517,7 @@ class PianoRollNotesModule extends PianoRollModule {
 
       MuonNoteController lastNote;
       for (final selectedNote in selectedNotes.keys) {
-        if (selectedNotes[selectedNote]) {
+        if (selectedNotes[selectedNote] == true) {
           selectedNote.addSemitones(moveBy);
           lastNote = selectedNote;
         }
@@ -537,7 +537,7 @@ class PianoRollNotesModule extends PianoRollModule {
 
       MuonNoteController lastNote;
       for (final selectedNote in selectedNotes.keys) {
-        if (selectedNotes[selectedNote]) {
+        if (selectedNotes[selectedNote] == true) {
           selectedNote.startAtTime = selectedNote.startAtTime + moveBy;
           lastNote = selectedNote;
         }
@@ -555,7 +555,7 @@ class PianoRollNotesModule extends PianoRollModule {
 
       MuonNoteController lastNote;
       for (final selectedNote in selectedNotes.keys) {
-        if (selectedNotes[selectedNote]) {
+        if (selectedNotes[selectedNote] == true) {
           selectedNote.startAtTime = max(0, selectedNote.startAtTime + moveBy);
           lastNote = selectedNote;
         }
@@ -582,7 +582,7 @@ class PianoRollNotesModule extends PianoRollModule {
       for (final note in voice.notes) {
         final noteRect = getNoteRect(note);
 
-        if (selectedNotes.containsKey(note) && selectedNotes[note]) {
+        if (selectedNotes.containsKey(note) && selectedNotes[note] == true) {
           final borderThickness = 10.0;
           if (themeData.brightness == Brightness.dark) {
             canvas.drawRect(noteRect, Paint()..color = Colors.white);
